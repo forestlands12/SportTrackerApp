@@ -95,13 +95,13 @@ app.get('/',  (req, res) => {
     res.render('index', {user: req.session.user} );
 });
 
-app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
-    // Fetch data from MySQL
-    connection.query('SELECT * FROM products', (error, results) => {
-      if (error) throw error;
-      res.render('dashboard', { activities: results, user: req.session.user });
-    });
-});
+// app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
+//     // Fetch data from MySQL
+//     connection.query('SELECT * FROM products', (error, results) => {
+//       if (error) throw error;
+//       res.render('dashboard', { activities: results, user: req.session.user });
+//     });
+// });
 
 app.get('/register', (req, res) => {
     res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
