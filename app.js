@@ -4,7 +4,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const multer = require('multer');
 const app = express();
-//test
+
 // Set up multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
