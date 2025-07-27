@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="/addProduct">Add Product</a>
+              <a class="nav-link" href="/addActivity">Add Activity</a>
             </li> 
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
@@ -30,30 +30,26 @@
   <div class="container">
     <p>Welcome, <%= user.username %> (<%= user.role %>)</p>
     <br>
-    <div class="text-center"><h2>Products from Supermarket App Database</h2></div>
+    <div class="text-center"><h2>Activities from SportTracker App Database</h2></div>
     <br>
     <table class="table table-hover small text-center">
       <thead>
           <tr>
-            <th width="100">Product Name</th>
-            <th width="100">Product Image</th>
-            <th width="50">Quantity</th>
-            <th width="50">Price</th>
+            <th width="100">Activity Name</th>
+            <th width="100">Activity Demostration</th>
             <th width="50">Edit</th>
             <th width="50">Delete</th>
           </tr>
       </thead>
       <tbody>
-        <% for(let i=0; i < products.length; i++) { %>
+        <% for(let i=0; i < activities.length; i++) { %>
           <tr>
-            <td><a href="/product/<%= products[i].productId %>" ><%= products[i].productName %></a></td>
-            <td><img src = "images/<%= products[i].image %>" width="20%"></td>
-            <td><%= products[i].quantity %></td>
-            <td>$<%= products[i].price.toFixed(2) %></td>
+            <td><a href="/activities/<%= activities[i].activityId %>" ><%= activities[i].activityName %></a></td>
+            <td><img src = "videos/<%= activities[i].video %>" width="20%"></td>
             <!-- Edit Link -->
-            <td><a href="/updateProduct/<%= products[i].productId %>">Edit</a></td>
+            <td><a href="/updateActivity/<%= activities[i].activityId %>">Edit</a></td>
             <!-- Delete Link -->
-            <td><a href="/deleteProduct/<%= products[i].productId %>" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a></td>
+            <td><a href="/deleteActivity/<%= activities[i].activityId %>" onclick="return confirm('Are you sure you want to delete this activity?')">Delete</a></td>
           </tr>
         <% } %>
       </tbody>
