@@ -35,14 +35,11 @@
       <% for (let i = 0; i < activities.length; i++) { %>
         <div class="col-md-4 mb-4">
           <div class="card">
-            <img src="/images/<%= activities[i].image %>" class="card-img-top" alt="<%= activities[i].productName %>" style="height: 200px; object-fit: cover;">
+            <img src="/images/<%= activities[i].image %>" class="card-img-top" alt="<%= activities[i].activityName %>" style="height: 200px; object-fit: cover;">
             <div class="card-body">
-              <h5 class="card-title"><%= activities[i].productName %></h5>
-              <p class="card-text">Cost: $<%= activities[i].price.toFixed(2) %></p>
-              <form action="/track-activity/<%= activities[i].productId %>" method="post">
+              <h5 class="card-title"><%= activities[i].activityName %></h5>
+              <form action="/track-activity/<%= activities[i].activityId %>" method="post">
                 <div class="form-group">
-                  <label for="quantity">Count:</label>
-                  <input type="number" name="quantity" class="form-control" value="1" min="1">
                 </div>
                 <button type="submit" class="btn btn-primary mt-2">Track Activity</button>
               </form>

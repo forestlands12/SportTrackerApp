@@ -38,10 +38,8 @@
         <div class="text-center"><h2>Activity Details</h2></div>
         <br>
         <% if (activity) { %> <div>
-                <p><b>Activity Name:</b><br> <%= activity.productName %></p>
-                <p><b>Activity Image:</b><br> <img src = "../images/<%= activity.image %>" width="20%"></p>
-                <p><b>Count:</b><br> <%= activity.quantity %></p>
-                <p><b>Cost:</b><br> $<%= activity.price.toFixed(2) %></p> 
+                <p><b>Activity Name:</b><br> <%= activity.activityName %></p>
+                <p><b>Activity Image:</b><br> <img src = "../videos/<%= activity.video %>" width="20%"></p>
             </div>
         <% } else { %>
             <p>No activity found.</p>
