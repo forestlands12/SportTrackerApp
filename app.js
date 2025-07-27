@@ -95,13 +95,13 @@ app.get('/',  (req, res) => {
     res.render('index', {user: req.session.user} );
 });
 
-// app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
-//     // Fetch data from MySQL
-//     connection.query('SELECT * FROM products', (error, results) => {
-//       if (error) throw error;
-//       res.render('dashboard', { activities: results, user: req.session.user });
-//     });
-// });
+app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
+    // Fetch data from MySQL
+    connection.query('SELECT * FROM activities', (error, results) => {
+      if (error) throw error;
+      res.render('dashboard', { activities: results, user: req.session.user });
+    });
+});
 
 app.get('/register', (req, res) => {
     res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
@@ -159,7 +159,7 @@ app.post('/login', (req, res) => {
 
 app.get('/activities', checkAuthenticated, (req, res) => {
     // Fetch data from MySQL
-    connection.query('SELECT * FROM products', (error, results) => {
+    connection.query('SELECT * FROM activities', (error, results) => {
         if (error) throw error;
         res.render('activities', { user: req.session.user, activities: results });
       });
@@ -169,7 +169,7 @@ app.post('/track-activity/:id', checkAuthenticated, (req, res) => {
     const activityId = parseInt(req.params.id);
     const quantity = parseInt(req.body.quantity) || 1;
 
-    connection.query('SELECT * FROM products WHERE productId = ?', [activityId], (error, results) => {
+    connection.query('SELECT * FROM activities WHERE activityId = ?', [activityId], (error, results) => {
         if (error) throw error;
 
         if (results.length > 0) {
@@ -181,13 +181,13 @@ app.post('/track-activity/:id', checkAuthenticated, (req, res) => {
             }
 
             // Check if activity already in summary
-            const existingItem = req.session.summary.find(item => item.productId === activityId);
+            const existingItem = req.session.summary.find(item => item.activityId === activityId);
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
                 req.session.summary.push({
-                    productId: activity.productId,
-                    productName: activity.productName,
+                    activityId: activity.activityId,
+                    activityName: activity.activityName,
                     price: activity.price,
                     quantity: quantity,
                     image: activity.image
@@ -216,7 +216,7 @@ app.get('/activity/:id', checkAuthenticated, (req, res) => {
   const activityId = req.params.id;
 
   // Fetch data from MySQL based on the activity ID
-  connection.query('SELECT * FROM products WHERE productId = ?', [activityId], (error, results) => {
+  connection.query('SELECT * FROM activities WHERE activityId = ?', [activityId], (error, results) => {
       if (error) throw error;
 
       // Check if any activity with the given ID was found
@@ -244,7 +244,7 @@ app.post('/addActivity', upload.single('image'),  (req, res) => {
         image = null;
     }
 
-    const sql = 'INSERT INTO products (productName, quantity, price, image) VALUES (?, ?, ?, ?)';
+    const sql = 'INSERT INTO activity (activityName, quantity, price, image) VALUES (?, ?, ?, ?)';
     // Insert the new activity into the database
     connection.query(sql , [name, quantity, price, image], (error, results) => {
         if (error) {
@@ -260,7 +260,7 @@ app.post('/addActivity', upload.single('image'),  (req, res) => {
 
 app.get('/updateActivity/:id',checkAuthenticated, checkAdmin, (req,res) => {
     const activityId = req.params.id;
-    const sql = 'SELECT * FROM products WHERE productId = ?';
+    const sql = 'SELECT * FROM activities WHERE activityId = ?';
 
     // Fetch data from MySQL based on the activity ID
     connection.query(sql , [activityId], (error, results) => {
@@ -286,7 +286,7 @@ app.post('/updateActivity/:id', upload.single('image'), (req, res) => {
         image = req.file.filename; // set image to be new image filename
     } 
 
-    const sql = 'UPDATE products SET productName = ? , quantity = ?, price = ?, image =? WHERE productId = ?';
+    const sql = 'UPDATE activities SET activityName = ? , quantity = ?, price = ?, image =? WHERE activityId = ?';
     // Insert the new activity into the database
     connection.query(sql, [name, quantity, price, image, activityId], (error, results) => {
         if (error) {
@@ -303,7 +303,7 @@ app.post('/updateActivity/:id', upload.single('image'), (req, res) => {
 app.get('/deleteActivity/:id', (req, res) => {
     const activityId = req.params.id;
 
-    connection.query('DELETE FROM products WHERE productId = ?', [activityId], (error, results) => {
+    connection.query('DELETE FROM activites WHERE activitiesId = ?', [activityId], (error, results) => {
         if (error) {
             // Handle any error that occurs during the database operation
             console.error("Error deleting activity:", error);
