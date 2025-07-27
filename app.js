@@ -188,9 +188,7 @@ app.post('/track-activity/:id', checkAuthenticated, (req, res) => {
                 req.session.summary.push({
                     activityId: activity.activityId,
                     activityName: activity.activityName,
-                    price: activity.price,
-                    quantity: quantity,
-                    image: activity.image
+                    video: activity.video
                 });
             }
 
@@ -234,19 +232,19 @@ app.get('/addActivity', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('addActivity', {user: req.session.user } ); 
 });
 
-app.post('/addActivity', upload.single('image'),  (req, res) => {
+app.post('/addActivity', upload.single('video'),  (req, res) => {
     // Extract activity data from the request body
-    const { name, quantity, price} = req.body;
-    let image;
+    const { name } = req.body;
+    let video;
     if (req.file) {
-        image = req.file.filename; // Save only the filename
+        video = req.file.filename; // Save only the filename
     } else {
-        image = null;
+        video = null;
     }
 
-    const sql = 'INSERT INTO activity (activityName, quantity, price, image) VALUES (?, ?, ?, ?)';
+    const sql = 'INSERT INTO activity (activityName, video) VALUES (?, ?)';
     // Insert the new activity into the database
-    connection.query(sql , [name, quantity, price, image], (error, results) => {
+    connection.query(sql , [name, video], (error, results) => {
         if (error) {
             // Handle any error that occurs during the database operation
             console.error("Error adding activity:", error);
@@ -281,14 +279,14 @@ app.post('/updateActivity/:id', upload.single('image'), (req, res) => {
     const activityId = req.params.id;
     // Extract activity data from the request body
     const { name, quantity, price } = req.body;
-    let image  = req.body.currentImage; //retrieve current image filename
+    let image  = req.body.currentVideo; //retrieve current image filename
     if (req.file) { //if new image is uploaded
         image = req.file.filename; // set image to be new image filename
     } 
 
-    const sql = 'UPDATE activities SET activityName = ? , quantity = ?, price = ?, image =? WHERE activityId = ?';
+    const sql = 'UPDATE activities SET activityName = ? , video =? WHERE activityId = ?';
     // Insert the new activity into the database
-    connection.query(sql, [name, quantity, price, image, activityId], (error, results) => {
+    connection.query(sql, [name, video, activityId], (error, results) => {
         if (error) {
             // Handle any error that occurs during the database operation
             console.error("Error updating activity:", error);
