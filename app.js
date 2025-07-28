@@ -313,5 +313,11 @@ app.get('/deleteActivity/:id', (req, res) => {
     });
 });
 
+app.get('/profile', checkAuthenticated, (req, res) => {
+    const summary = req.session.summary || [];
+    res.render('profile', { user: req.session.user, summary });
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
