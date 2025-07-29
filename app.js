@@ -1,3 +1,5 @@
+// app.js
+
 const express = require('express');
 const mysql = require('mysql2');
 const session = require('express-session');
@@ -318,6 +320,25 @@ app.get('/profile', checkAuthenticated, (req, res) => {
     res.render('profile', { user: req.session.user, summary });
 });
 
+app.get('/edit-profile', checkAuthenticated, (req, res) => {
+    res.render('editProfile', { user: req.session.user });
+});
+
+app.post('/edit-profile', checkAuthenticated, (req, res) => {
+    const { email, address, contact } = req.body;
+    const userId = req.session.user.id;
+
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
+    connection.query(sql, [email, address, contact, userId], (err, result) => {
+        if (err) throw err;
+
+        req.session.user.email = email;
+        req.session.user.address = address;
+        req.session.user.contact = contact;
+
+        res.redirect('/profile');
+    });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
