@@ -52,7 +52,7 @@
       </div>
       <div class="col-md-6">
         <h3>Your Profile Picture</h3>
-        <img src="<%= user.profilePicture ? user.profilePicture : '/images/default-profile.jpg' %>" alt="Profile Picture" class="img-fluid rounded-circle" width="200">
+        <img src="<%= user.profilePicture ? '/images/' + user.profilePicture : '/images/default-profile.jpg' %>" alt="Profile Picture" class="img-fluid rounded-circle" width="200">
         <a href="/profile/upload" class="btn btn-primary mt-3">Upload New Picture</a>
       </div>
     </div>
@@ -60,26 +60,33 @@
     <!-- Activity Summary Section -->
     <hr>
     <h3>Tracked Activities</h3>
-    <% if (summary && summary.length > 0) { %>
+    <% if (workouts && workouts.length > 0) { %>
       <div class="row">
         <div class="col-md-6">
-          <p><strong>Total Activities Tracked:</strong> <%= summary.length %></p>
+          <p><strong>Total Activities Tracked:</strong> <%= workouts.length %></p>
         </div>
         <div class="col-md-6 text-end">
-          <a href="/log/new" class="btn btn-success">Log New Activity <i class="fa fa-plus"></i></a>
+          <a href="/log-workout" class="btn btn-success">Log New Activity <i class="fa fa-plus"></i></a>
         </div>
       </div>
       <ul class="list-group mt-3">
-        <% summary.forEach(activity => { %>
+        <% workouts.forEach(workout => { %>
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <%= activity.activityName %> 
-            <span class="badge bg-primary rounded-pill"><%= activity.repetitions || '1x' %></span>
+            <div>
+              <strong><%= workout.workout_type %></strong> <br>
+              <small>Duration: <%= workout.duration %> mins</small> <br>
+              <small>Calories Burned: <%= workout.calories_burned %> kcal</small> <br>
+              <small>Intensity: <%= workout.intensity %></small>
+            </div>
+            <span class="badge bg-primary rounded-pill">
+              <%= new Date(workout.workout_date).toLocaleDateString() %>
+            </span>
           </li>
         <% }) %>
       </ul>
     <% } else { %>
       <p>You haven't tracked any activities yet. Start tracking today!</p>
-      <a href="/log/new" class="btn btn-primary">Log New Activity <i class="fa fa-plus"></i></a>
+      <a href="/log-workout" class="btn btn-primary">Log New Activity <i class="fa fa-plus"></i></a>
     <% } %>
   </div>
 
@@ -93,4 +100,3 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

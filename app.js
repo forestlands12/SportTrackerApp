@@ -338,5 +338,35 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+// Route to display workout log form (GET)
+app.get('/log-workout', checkAuthenticated, (req, res) => {
+    res.render('workout-log', { user: req.session.user });
+});
+
+// Route to handle workout log form submission (POST)
+app.post('/log-workout', checkAuthenticated, (req, res) => {
+    const { workout_type, duration, calories_burned, intensity } = req.body;
+    const workout_date = new Date(); // Get current date
+
+    // Insert workout into the database
+    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
+    connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
+        if (err) throw err;
+        res.redirect('/log-workout');  // Redirect back to log workout page after submission
+    });
+});
+
+// Route to display profile page and logged workouts (combined)
+app.get('/profile', checkAuthenticated, (req, res) => {
+    // Fetch logged workouts for the user from the database
+    const sql = 'SELECT * FROM workouts WHERE user_id = ? ORDER BY workout_date DESC';
+    connection.query(sql, [req.session.user.id], (err, workouts) => {
+        if (err) throw err;
+        // Pass logged workouts to the profile page (workouts will be displayed in profile.ejs)
+        res.render('profile', { user: req.session.user, workouts });  
+    });
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
