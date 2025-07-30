@@ -481,13 +481,17 @@ app.post('/contact', (req, res) => {
 });
 
 app.get('/plans', (req, res) => {
-    const sql = 'SELECT p.plan_id, p.plan_name, a.activity_id, a.activity_name FROM plans p JOIN plan_activities pa ON p.plan_id = pa.plan_id JOIN activities a ON pa.activity_id = a.activity_id WHERE p.user_id = ?';
+    const sql = 'SELECT p.plan_id, p.difficulty, a.activityid, a.activityname FROM plans p JOIN plan_activities pa ON p.plansid = pa.plan_id JOIN activities a ON pa.activity_id = a.activityid WHERE p.userid = ?';
+    if (!req.session.user) {
+        return res.redirect('/login'); // or handle unauthorized access
+    };
+
     const userId = req.session.user.id;
-    connection.query(sql, [userId], (err, resutlts) => {
+    connection.query(sql, [userId], (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Database error');
-        }
+        };
 
         const plans = {};
         results.forEach(row => {
@@ -496,7 +500,8 @@ app.get('/plans', (req, res) => {
                     plan_name: row.plan_name,
                     activities: []
                 };
-            }
+            };
+
             plans[row.plan_id].activities.push({
                 id: row.activity_id,
                 name: row.activity_name
