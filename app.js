@@ -365,16 +365,7 @@ app.get('/contact', (req, res) => {
 // POST route - Handle contact form submission
 app.post('/contact', (req, res) => {
     const { name, email, subject, message } = req.body;
-    
-    // Log the contact form data (you can save to database later if needed)
-    console.log('Contact form submitted:');
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Subject:', subject);
-    console.log('Message:', message);
-    console.log('Submitted at:', new Date());
-    
-    
+    console.log('Contact form submitted:', { name, email, subject, message });
     res.redirect('/contact');
 });
 
