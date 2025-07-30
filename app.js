@@ -462,7 +462,7 @@ app.post('/add-goal', checkAuthenticated,(req, res) => {
   const sql = 'INSERT INTO goals (user_id, goal, status) VALUES (?, ?, ?)';
   connection.query(sql, [userId, description, status], (err, result) => {
     if (err) {
-      console.error('❌ Database error:', err); 
+      console.error(' Database error:', err); 
       return res.send(`Database error: ${err.sqlMessage || err.message}`);
     }
 
@@ -471,19 +471,23 @@ app.post('/add-goal', checkAuthenticated,(req, res) => {
 });
 
 
-app.get('/log-workout', checkAuthenticated, (req, res) => {
-    res.render('workout-log', { user: req.session.user });
+app.get('/workout-log', (req, res) => {
+  const workout_log = []; 
+  res.render('workout-log', { workout_log });
 });
 
-app.post('/log-workout', checkAuthenticated, (req, res) => {
-    const { workout_type, duration, calories_burned, intensity } = req.body;
-    const workout_date = new Date(); // Get current date
 
-    // Insert workout into the database
-    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
+app.post('/add-workout-log', checkAuthenticated, (req, res) => {
+    const { workout_type, duration, calories_burned, intensity } = req.body;
+    const workout_date = new Date();
+
+    const sql = 'INSERT INTO workout_log (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
     connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
-        if (err) throw err;
-        res.redirect('/log-workout');  // Redirect back to log workout page after submission
+        if (err) {
+            console.error('❌ Database error:', err);
+            return res.send(`Database error: ${err.sqlMessage || err.message}`);
+        }
+        res.redirect('/workout-log');
     });
 });
 
