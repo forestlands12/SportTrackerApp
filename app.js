@@ -390,17 +390,23 @@ app.get('/deleteActivity/:id', (req, res) => {
 app.get('/profile', checkAuthenticated, (req, res) => {
     const userId = req.session.user.id;
 
-    const sql = 'SELECT * FROM goal_table WHERE user_id = ?';
-    connection.query(sql, [userId], (err, results) => {
+    const goalQuery = 'SELECT * FROM goal_table WHERE user_id = ?';
+    const summaryQuery = 'SELECT * FROM workout_log WHERE user_id = ?';
+
+    connection.query(goalQuery, [userId], (err, goalResults) => {
         if (err) throw err;
 
-        res.render('profile', {
-            user: req.session.user,
-            goals: results
+        connection.query(summaryQuery, [userId], (err, summaryResults) => {
+            if (err) throw err;
+
+            res.render('profile', {
+                user: req.session.user,
+                goals: goalResults,
+                summary: summaryResults
+            });
         });
     });
 });
-
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
     res.render('editProfile', { user: req.session.user });
