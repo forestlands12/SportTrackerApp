@@ -94,10 +94,7 @@ const validateRegistration = (req, res, next) => {
 
 // Define routes
 app.get('/',  (req, res) => {
-    connection.query('SELECT * FROM activities', (error, results) => {
-        if (error) throw error;
-        res.render('activities', { user: req.session.user, activities: results });
-      });
+    res.render('index', {user: req.session.user} );
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
@@ -320,26 +317,25 @@ app.get('/deleteActivity/:id', (req, res) => {
 
 app.get('/profile', checkAuthenticated, (req, res) => {
     const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user, summary });
+    res.render('profile', { user: req.session.user });
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
-    res.render('editprofile', { user: req.session.user });
+    res.render('editProfile', { user: req.session.user });
 });
 
-app.post('/edit-profile', (req, res) => {
-    const userId = req.session.user.id;
+app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const { email, address, contact } = req.body;
+    const userId = req.session.user.userId; // or use session ID
 
-    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
-
-    connection.query(sql, [email, address, contact, userId], (error, results) => {
-        if (error) {
-            console.error("Error updating user:", error);
-            return res.status(500).send('Error updating user profile');
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
+    connection.query(sql, [email, address, contact, userId], (err, result) => {
+        if (err) {
+            console.error("Error updating profile:", err);
+            return res.status(500).send('Error updating profile');
         }
 
-        // Update session info with new values
+        // Update session user so profile page shows new info
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
