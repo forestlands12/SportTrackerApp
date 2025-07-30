@@ -462,7 +462,7 @@ app.post('/add-goal', checkAuthenticated,(req, res) => {
   const sql = 'INSERT INTO goals (user_id, goal, status) VALUES (?, ?, ?)';
   connection.query(sql, [userId, description, status], (err, result) => {
     if (err) {
-      console.error('❌ Database error:', err); 
+      console.error(' Database error:', err); 
       return res.send(`Database error: ${err.sqlMessage || err.message}`);
     }
 
