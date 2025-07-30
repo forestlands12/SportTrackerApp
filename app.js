@@ -492,26 +492,24 @@ app.post('/contact', (req, res) => {
     });
 });
 
-app.get('/plans', (req, res) => {
+
+app.get('/plans', (req, res) => { //Done by Aloysius
     // Removed p.plan_name from the SELECT statement as it's not available
     const sql = `SELECT p.plansid, p.plansname, p.difficulty, a.activityid, a.activityname
     FROM plans p
     JOIN plans_activities pa ON p.plansid = pa.plansid
     JOIN activities a ON pa.activitiesid = a.activityid
     WHERE p.userid = ?`;
-
     // Check if user is logged in
     if (!req.session.user) {
         return res.redirect('/login'); // Redirect to login if not authorized
     }
-
     const userId = req.session.user.id;
     connection.query(sql, [userId], (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Database error');
         }
-
         const plans = {};
         results.forEach(row => {
             if (!plans[row.plansid]) {
@@ -522,18 +520,17 @@ app.get('/plans', (req, res) => {
                     activities: []
                 };
             }
-
             // Add activities to the corresponding plan
             plans[row.plansid].activities.push({
                 id: row.activityid,
                 name: row.activityname
             });
         });
-
         // Render the browsePlans.ejs template with the structured plans data
         res.render('browsePlans', { plans });
     });
 });
+
 
 
 const PORT = process.env.PORT || 3000;

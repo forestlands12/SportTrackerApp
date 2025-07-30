@@ -67,7 +67,7 @@
 
     <% if (Object.keys(plans).length === 0) { %>
       <div class="alert alert-info" role="alert">
-        You don't have any training plans yet. Create one to get started!
+        You don't have any training plans yet. Click <a href="/addPlans" class="btn btn-outline-primary mt-3">here</a> to create one to get started!
       </div>
     <% } else { %>
       <% Object.entries(plans).forEach(([planId, plan]) => { %>
