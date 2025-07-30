@@ -388,19 +388,31 @@ app.get('/deleteActivity/:id', (req, res) => {
 });
 
 app.get('/profile', checkAuthenticated, (req, res) => {
-    const userId = req.session.user.id;
+    const userId = req.session.user?.id;
 
-    const sql = 'SELECT * FROM goal_table WHERE user_id = ?';
-    connection.query(sql, [userId], (err, results) => {
-        if (err) throw err;
+    const goalQuery = 'SELECT * FROM goals WHERE user_id = ?';
+    const summaryQuery = 'SELECT * FROM workout_log WHERE user_id = ?';
 
-        res.render('profile', {
-            user: req.session.user,
-            goals: results
+    connection.query(goalQuery, [userId], (err, goalResults) => {
+        if (err) {
+            console.error('Goal query error:', err);
+            return res.status(500).send('Database error: goal_table');
+        }
+
+        connection.query(summaryQuery, [userId], (err, summaryResults) => {
+            if (err) {
+                console.error('Summary query error:', err);
+                return res.status(500).send('Database error: workout_log');
+            }
+
+            res.render('profile', {
+                user: req.session.user,
+                goals: goalResults,
+                summary: summaryResults
+            });
         });
     });
 });
-
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
     res.render('editProfile', { user: req.session.user });
@@ -421,6 +433,23 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.post('/profile/upload', checkAuthenticated, upload.single('profilePicture'), (req, res) => {
+    const userId = req.session.user.id;
+    const profilePicPath = '/images/' + req.file.filename;
+
+    const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
+    connection.query(sql, [profilePicPath, userId], (err, result) => {
+        if (err) {
+            console.error('Error saving profile picture:', err);
+            return res.status(500).send('Database error');
+        }
+
+        req.session.user.profilePicture = profilePicPath;
+
+        res.redirect('/profile');
+    });
+});
+
 app.get('/goal-log', (req, res) => {
   const goals = []; 
   res.render('goal-log', { goals });
@@ -428,33 +457,37 @@ app.get('/goal-log', (req, res) => {
 
 app.post('/add-goal', checkAuthenticated,(req, res) => {
   const { description, status } = req.body;
-  const userId = req.session.user.id; // or however you're storing the logged-in user
+  const userId = req.session.user.id; 
 
-  const sql = 'INSERT INTO goals (user_id, description, status) VALUES (?, ?, ?)';
+  const sql = 'INSERT INTO goals (user_id, goal, status) VALUES (?, ?, ?)';
   connection.query(sql, [userId, description, status], (err, result) => {
     if (err) {
-      console.error(err);
-      return res.status(500).send('Database error');
+      console.error(' Database error:', err); 
+      return res.send(`Database error: ${err.sqlMessage || err.message}`);
     }
 
-    res.redirect('/goal-log'); // or wherever you want to redirect after saving
+    res.redirect('/goal-log');
   });
 });
 
 
-app.get('/log-workout', checkAuthenticated, (req, res) => {
-    res.render('workout-log', { user: req.session.user });
+app.get('/workout-log', (req, res) => {
+  const workout_log = []; 
+  res.render('workout-log', { workout_log });
 });
 
-app.post('/log-workout', checkAuthenticated, (req, res) => {
-    const { workout_type, duration, calories_burned, intensity } = req.body;
-    const workout_date = new Date(); // Get current date
 
-    // Insert workout into the database
-    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
+app.post('/add-workout-log', checkAuthenticated, (req, res) => {
+    const { workout_type, duration, calories_burned, intensity } = req.body;
+    const workout_date = new Date();
+
+    const sql = 'INSERT INTO workout_log (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
     connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
-        if (err) throw err;
-        res.redirect('/log-workout');  // Redirect back to log workout page after submission
+        if (err) {
+            console.error('❌ Database error:', err);
+            return res.send(`Database error: ${err.sqlMessage || err.message}`);
+        }
+        res.redirect('/workout-log');
     });
 });
 
@@ -480,35 +513,43 @@ app.post('/contact', (req, res) => {
     });
 });
 
-app.get('/plans', (req, res) => {
-    const sql = 'SELECT p.plan_id, p.plan_name, a.activity_id, a.activity_name FROM plans p JOIN plan_activities pa ON p.plan_id = pa.plan_id JOIN activities a ON pa.activity_id = a.activity_id WHERE p.user_id = ?';
+
+app.get('/plans', (req, res) => { //Done by Aloysius
+    // Removed p.plan_name from the SELECT statement as it's not available
+    const sql = `SELECT p.plansid, p.plansname, p.difficulty, a.activityid, a.activityname
+    FROM plans p
+    JOIN plans_activities pa ON p.plansid = pa.plansid
+    JOIN activities a ON pa.activitiesid = a.activityid
+    WHERE p.userid = ?`;
+    // Check if user is logged in
+    if (!req.session.user) {
+        return res.redirect('/login'); // Redirect to login if not authorized
+    }
     const userId = req.session.user.id;
-    connection.query(sql, [userId], (err, resutlts) => {
+    connection.query(sql, [userId], (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Database error');
         }
-
         const plans = {};
         results.forEach(row => {
-            if (!plans[row.plan_id]) {
-                plans[row.plan_id] = {
-                    plan_name: row.plan_name,
+            if (!plans[row.plansid]) {
+                // Store plan details, using planId as the primary identifier
+                plans[row.plansid] = {
+                    name: row.plansname, // Store the plan ID
+                    difficulty: row.difficulty,
                     activities: []
                 };
-            }
-            plans[row.plan_id].activities.push({
-                id: row.activity_id,
-                name: row.activity_name
+            };
+            // Add activities to the corresponding plan
+            plans[row.plansid].activities.push({
+                id: row.activityid,
+                name: row.activityname
             });
         });
-
+        // Render the browsePlans.ejs template with the structured plans data
         res.render('browsePlans', { plans });
     });
-});
-
-app.get('/faq', (req, res) => {
-    res.render('faq_page');
 });
 
 const PORT = process.env.PORT || 3000;
