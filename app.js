@@ -369,6 +369,21 @@ app.get('/goal-log', (req, res) => {
   res.render('goal-log', { goals });
 });
 
+app.post('/add-goal', (req, res) => {
+  const { description, status } = req.body;
+  const userId = req.session.user.id; // or however you're storing the logged-in user
+
+  const sql = 'INSERT INTO goals (user_id, description, status) VALUES (?, ?, ?)';
+  connection.query(sql, [userId, description, status], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error');
+    }
+
+    res.redirect('/goal-log'); // or wherever you want to redirect after saving
+  });
+});
+
 
 app.get('/log-workout', checkAuthenticated, (req, res) => {
     res.render('workout-log', { user: req.session.user });
