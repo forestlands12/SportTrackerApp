@@ -587,5 +587,84 @@ app.get('/plans', (req, res) => { //Done by Aloysius
     });
 });
 
+app.get('/addPlans', (req, res) => { //Done by Aloysius
+    // Ensure user is logged in before accessing this page
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    const sqlActivities = `SELECT activityid, activityname, difficulty FROM activities`;
+    connection.query(sqlActivities, (err, activities) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error fetching activities');
+        }
+        res.render('addPlans', { activities });
+    });
+});
+
+app.post('/addPlans', (req, res) => { //Done by Aloysius
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const { planName, difficulty, selectedActivities } = req.body;
+    const userId = req.session.user.id;
+    if (!planName || !difficulty) {
+        return res.status(400).send('Plan name and difficulty are required.');
+    }
+
+    const newPlanId = Date.now();
+
+    connection.beginTransaction(err => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Failed to start database transaction.');
+        }
+        const insertPlanSql = `INSERT INTO plans (plansid, plansname, difficulty, userid) VALUES (?, ?, ?, ?)`;
+        connection.query(insertPlanSql, [newPlanId, planName, difficulty, userId], (err, result) => {
+            if (err) {
+                return connection.rollback(() => {
+                    console.error(err);
+                    res.status(500).send('Error adding plan to the database.');
+                });
+            }
+            const activitiesToInsert = Array.isArray(selectedActivities) ? selectedActivities : (selectedActivities ? [selectedActivities] : []);
+
+            if (activitiesToInsert.length === 0) {
+                return connection.commit(commitErr => {
+                    if (commitErr) {
+                        console.error(commitErr);
+                        return res.status(500).send('Error committing transaction for plan without activities.');
+                    }
+                    console.log(`Plan "${planName}" (ID: ${newPlanId}) added successfully with no activities.`);
+                    res.redirect('/plans'); // Redirect to the plans list page
+                });
+            }
+
+            const insertPlanActivitiesSql = `INSERT INTO plans_activities (plansid, activitiesid) VALUES ?`;
+            const values = activitiesToInsert.map(activityId => [newPlanId, activityId]);
+
+            connection.query(insertPlanActivitiesSql, [values], (err, result) => {
+                if (err) {
+
+                    return connection.rollback(() => {
+                        console.error(err);
+                        res.status(500).send('Error linking activities to the plan.');
+                    });
+                }
+
+                connection.commit(commitErr => {
+                    if (commitErr) {
+                        console.error(commitErr);
+                        return res.status(500).send('Error committing transaction.');
+                    }
+                    console.log(`Plan "${planName}" (ID: ${newPlanId}) added successfully with ${activitiesToInsert.length} activities.`);
+                    res.redirect('/plans'); // Redirect to the plans list page
+                });
+            });
+        });
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
