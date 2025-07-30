@@ -438,11 +438,6 @@ app.get('/goal-log', (req, res) => {
   res.render('goal-log', { goals });
 });
 
-app.get('/goals/new', checkAuthenticated, (req, res) => {
-  res.render('goal-log'); // Or whatever EJS view you want to show for adding a new goal
-});
-
-
 app.post('/add-goal', checkAuthenticated,(req, res) => {
   const { description, status } = req.body;
   const userId = req.session.user.id; // or however you're storing the logged-in user
