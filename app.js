@@ -93,16 +93,8 @@ const validateRegistration = (req, res, next) => {
 };
 
 // Define routes
-app.get('/', (req, res) => {
-    if (req.session.user) {
-        if (req.session.user.role === 'admin') {
-            res.redirect('/dashboard');
-        } else {
-            res.redirect('/activities');
-        }
-    } else {
-        res.render('index', { user: null });
-    }
+app.get('/',  (req, res) => {
+    res.render('index', {user: req.session.user} );
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
@@ -242,6 +234,7 @@ app.get('/addActivity', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('addActivity', {user: req.session.user } ); 
 });
 
+
 app.post('/addActivity', upload.single('video'),  (req, res) => {
     // Extract activity data from the request body
     const { name } = req.body;
@@ -325,7 +318,22 @@ app.get('/deleteActivity/:id', (req, res) => {
 
 app.get('/profile', checkAuthenticated, (req, res) => {
     const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user });
+    const userId = req.session.user.id;
+
+    const sql = 'SELECT * FROM goal_table WHERE user_id = ?';
+
+    connection.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching goals:', err);
+            return res.status(500).send('Error loading profile');
+        }
+
+        res.render('profile', {
+            user: req.session.user,
+            summary,
+            goals: results || [] 
+        });
+    });
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
@@ -334,16 +342,12 @@ app.get('/edit-profile', checkAuthenticated, (req, res) => {
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const { email, address, contact } = req.body;
-    const userId = req.session.user.userId; // or use session ID
+    const userId = req.session.user.id;
 
-    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
     connection.query(sql, [email, address, contact, userId], (err, result) => {
-        if (err) {
-            console.error("Error updating profile:", err);
-            return res.status(500).send('Error updating profile');
-        }
+        if (err) throw err;
 
-        // Update session user so profile page shows new info
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
@@ -357,6 +361,50 @@ app.get('/plans', (req, res) => {
     connection.query(sql, [activityName, video, difficulty], (err, resutlts) => {
 
     });
+app.get('/log-workout', checkAuthenticated, (req, res) => {
+    res.render('workout-log', { user: req.session.user });
+});
+
+app.post('/log-workout', checkAuthenticated, (req, res) => {
+    const { workout_type, duration, calories_burned, intensity } = req.body;
+    const workout_date = new Date(); // Get current date
+
+    // Insert workout into the database
+    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
+    connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
+        if (err) throw err;
+        res.redirect('/log-workout');  // Redirect back to log workout page after submission
+    });
+});
+
+// GET route - Display contact page
+app.get('/contact', (req, res) => {
+    res.render('contact', { user: req.session.user });
+});
+
+// POST route - Handle contact form submission
+app.post('/contact', (req, res) => {
+    const { name, email, subject, message } = req.body;
+    
+    const sql = 'INSERT INTO contact (name, email, subject, message) VALUES (?, ?, ?, ?)';
+    connection.query(sql, [name, email, subject, message], (err, result) => {
+        if (err) {
+            console.error('Error saving contact:', err);
+            res.status(500).send('Error saving contact');
+        } else {
+            console.log('Contact form submitted and saved:', { name, email, subject });
+            req.flash('success', 'Your message has been sent successfully!');
+            res.redirect('/contact');
+        }
+    });
+});
+
+app.get('/plan/:id', (req, res) => {
+    res.render('plan');
+});
+
+app.get('/browse-plans', (req, res) => {
+    res.render('browsePlans');
 });
 
 const PORT = process.env.PORT || 3000;
