@@ -455,16 +455,16 @@ app.get('/goal-log', (req, res) => {
 
 app.post('/add-goal', checkAuthenticated,(req, res) => {
   const { description, status } = req.body;
-  const userId = req.session.user.id; // or however you're storing the logged-in user
+  const userId = req.session.user.id; 
 
   const sql = 'INSERT INTO goals (user_id, goal, status) VALUES (?, ?, ?)';
   connection.query(sql, [userId, description, status], (err, result) => {
     if (err) {
-      console.error('❌ Database error:', err); // Log actual error in console
+      console.error('❌ Database error:', err); 
       return res.send(`Database error: ${err.sqlMessage || err.message}`);
     }
 
-    res.redirect('/goal-log'); // or wherever you want to redirect after saving
+    res.redirect('/goal-log');
   });
 });
 
