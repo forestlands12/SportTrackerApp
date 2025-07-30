@@ -408,7 +408,8 @@ app.get('/profile', checkAuthenticated, (req, res) => {
             res.render('profile', {
                 user: req.session.user,
                 goals: goalResults,
-                summary: summaryResults
+                summary: summaryResults,
+                profilePic: profile_picture
             });
         });
     });
