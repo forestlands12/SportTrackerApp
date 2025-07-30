@@ -52,13 +52,16 @@
           </li>
           <!-- Combined View Plans and Add New Plan into a dropdown -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPlans" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Plans
             </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
+            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownPlans">
               <li><a class="dropdown-item" href="/plans">View All Plans</a></li>
               <li><a class="dropdown-item" href="/addPlans">Create New Plan</a></li>
             </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/workout-log">Logout</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
@@ -67,6 +70,7 @@
       </div>
     </div>
   </nav>
+
   <div class="container content-box">
     <h2 class="mt-4">Activity Summary</h2>
     <% if (summary.length === 0) { %>
