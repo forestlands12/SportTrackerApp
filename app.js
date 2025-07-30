@@ -340,21 +340,5 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
-app.get('/log/new', checkAuthenticated, (req, res) => {
-    res.render('workout-log', { user: req.session.user });
-});
-
-app.post('/log/new', checkAuthenticated, (req, res) => {
-    const { workout_type, duration, calories_burned, intensity } = req.body;
-    const workout_date = new Date(); // Get current date
-
-    // Insert workout into the database
-    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
-    connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
-        if (err) throw err;
-        res.redirect('/log-workout');  // Redirect back to log workout page after submission
-    });
-});
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
