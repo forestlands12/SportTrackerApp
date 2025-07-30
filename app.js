@@ -433,16 +433,18 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
-app.post('/profile/upload', upload.single('profile_picture'), (req, res) => {
+app.post('/profile/upload', checkAuthenticated, upload.single('profilePicture'), (req, res) => {
     const userId = req.session.user.id;
-    const filename = req.file.filename;
+    const profilePicPath = '/images/' + req.file.filename;
 
     const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
-    connection.query(sql, [filename, userId], (err, result) => {
-        if (err) throw err;
+    connection.query(sql, [profilePicPath, userId], (err, result) => {
+        if (err) {
+            console.error('Error saving profile picture:', err);
+            return res.status(500).send('Database error');
+        }
 
-        // Update session
-        req.session.user.profile_picture = filename;
+        req.session.user.profilePicture = profilePicPath;
 
         res.redirect('/profile');
     });
