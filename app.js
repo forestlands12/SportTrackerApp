@@ -316,12 +316,24 @@ app.get('/deleteActivity/:id', (req, res) => {
 });
 
 app.get('/profile', checkAuthenticated, (req, res) => {
-    const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user });
-});
+    if (!req.session.user) {
+        return res.status(403).send("User not logged in.");
+    }
 
-app.get('/edit-profile', checkAuthenticated, (req, res) => {
-    res.render('editProfile', { user: req.session.user });
+    const user = req.session.user;
+
+    const sql = 'SELECT * FROM activities WHERE userId = ?';
+    connection.query(sql, [user.userId], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        res.render('profile', {
+            user,
+            summary: results
+        });
+    });
 });
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {
