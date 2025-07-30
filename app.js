@@ -507,5 +507,9 @@ app.get('/plans', (req, res) => {
     });
 });
 
+app.get('/faq', (req, res) => {
+    res.render('faq_page');
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequently Asked Questions</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Styling for FAQ accordion items */
+        .faq-item {
+            border-bottom: 1px solid #e5e7eb; /* Light gray border */
+        }
+        .faq-question {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0; /* py-5 */
+            font-weight: 600; /* font-semibold */
+            color: #1f2937; /* text-gray-900 */
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding-bottom: 0; /* Initial state */
+            color: #4b5563; /* text-gray-700 */
+        }
+        .faq-answer.open {
+            max-height: 200px; /* Adjust as needed based on content */
+            padding-bottom: 1.25rem; /* py-5 */
+        }
+        .faq-question svg {
+            transition: transform 0.3s ease-out;
+        }
+        .faq-question.active svg {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 sm:p-6 lg:p-8">
+    <div class="max-w-4xl mx-auto py-8">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-indigo-700 mb-12">
+            <span class="block">Got Questions?</span>
+            <span class="block mt-2">We've Got Answers!</span>
+        </h1>
+
+        <p class="text-lg text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+            Find quick answers to the most common questions about SportTrackerApp, its features, and how to make the most of your fitness journey.
+        </p>
+
+        <!-- FAQ Section -->
+        <section class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+            <div class="faq-list">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item">
+                    <div class="faq-question text-xl">
+                        How do I log a new workout?
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer text-base">
+                        To log a new workout, navigate to the "Log Workout" section from your dashboard. Select the activity type, enter the duration, distance (if applicable), and any notes. Then, click "Save Workout".
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item">
+                    <div class="faq-question text-xl">
+                        Can I track different types of activities?
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer text-base">
+                        Yes! SportTrackerApp supports a wide range of activities including running, cycling, swimming, weightlifting, yoga, hiking, and more. You can select your activity type when logging a new workout.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="faq-item">
+                    <div class="faq-question text-xl">
+                        Is my data private and secure?
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer text-base">
+                        We take your privacy and data security very seriously. All your fitness data is encrypted and stored securely. We do not share your personal information with third parties without your explicit consent.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item">
+                    <div class="faq-question text-xl">
+                        How can I join or create a team?
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer text-base">
+                        To create a new team, go to the "Teams & Groups" section and click on "Create New Team". Fill in the team details and set your privacy preferences. To join an existing team, you can browse public teams or accept an invitation from a friend.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="faq-item">
+                    <div class="faq-question text-xl">
+                        Do you offer personalized coaching?
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer text-base">
+                        Yes, we offer personalized fitness coaching services. You can explore our 1-on-1 coaching, small group sessions, or custom training plans on the "Coaching Services" page. Fill out an inquiry form there to get started!
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="faq-item">
+                    <div class="faq-question text-xl">
+                        How can I contact support?
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer text-base">
+                        If you can't find your answer here, please visit our "Contact Us" page or send an email directly to support@sporttrackerapp.com. We aim to respond to all inquiries within 24-48 hours.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="text-center mt-16">
+            <p class="text-gray-600 text-lg mb-4">
+                Still have a question? Don't hesitate to reach out!
+            </p>
+            <a href="#" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out">
+                Contact Support
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    const isActive = question.classList.contains('active');
+
+                    // Close all other open answers
+                    document.querySelectorAll('.faq-question.active').forEach(activeQuestion => {
+                        if (activeQuestion !== question) {
+                            activeQuestion.classList.remove('active');
+                            activeQuestion.nextElementSibling.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle current question/answer
+                    question.classList.toggle('active');
+                    answer.classList.toggle('open');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
