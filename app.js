@@ -379,9 +379,19 @@ app.get('/deleteActivity/:id', (req, res) => {
 });
 
 app.get('/profile', checkAuthenticated, (req, res) => {
-    const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user, summary });
+    const userId = req.session.user.id;
+
+    const sql = 'SELECT * FROM goal_table WHERE user_id = ?';
+    connection.query(sql, [userId], (err, results) => {
+        if (err) throw err;
+
+        res.render('profile', {
+            user: req.session.user,
+            goals: results
+        });
+    });
 });
+
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
     res.render('editProfile', { user: req.session.user });
