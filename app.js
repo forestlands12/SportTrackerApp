@@ -317,25 +317,26 @@ app.get('/deleteActivity/:id', (req, res) => {
 
 app.get('/profile', checkAuthenticated, (req, res) => {
     const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user });
+    res.render('profile', { user: req.session.user, summary });
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
-    res.render('editProfile', { user: req.session.user });
+    res.render('editprofile', { user: req.session.user });
 });
 
-app.post('/edit-profile', checkAuthenticated, (req, res) => {
+app.post('/edit-profile', (req, res) => {
+    const userId = req.session.user.id;
     const { email, address, contact } = req.body;
-    const userId = req.session.user.userId; // or use session ID
 
-    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
-    connection.query(sql, [email, address, contact, userId], (err, result) => {
-        if (err) {
-            console.error("Error updating profile:", err);
-            return res.status(500).send('Error updating profile');
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
+
+    connection.query(sql, [email, address, contact, userId], (error, results) => {
+        if (error) {
+            console.error("Error updating user:", error);
+            return res.status(500).send('Error updating user profile');
         }
 
-        // Update session user so profile page shows new info
+        // Update session info with new values
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
