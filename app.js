@@ -94,7 +94,15 @@ const validateRegistration = (req, res, next) => {
 
 // Define routes
 app.get('/',  (req, res) => {
-    res.render('index', {user: req.session.user} );
+    if (req.session.user) {
+        if (req.session.user.role === 'admin') {
+            res.redirect('/dashboard');
+        } else {
+            res.redirect('/activities');
+        }
+    } else {
+        res.render('index', { user: null });
+    }
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
@@ -356,6 +364,11 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.get('/plans', (req, res) => {
+    const sql = 'SELECT * FROM user u JOIN userplans up ON u.id = up.userid JOIN plans_activity pa ON up.plans_activityid = pa.id JOIN activity a ON a.activityid = pa.activity_id JOIN plans p ON p.plansid = pa.plans_id';
+    connection.query(sql, [activityName, video, difficulty], (err, resutlts) => {
+
+    });
 app.get('/log-workout', checkAuthenticated, (req, res) => {
     res.render('workout-log', { user: req.session.user });
 });
@@ -403,4 +416,4 @@ app.get('/browse-plans', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`))});
