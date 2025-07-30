@@ -492,8 +492,8 @@ app.post('/contact', (req, res) => {
     });
 });
 
-//done by aloy 
-app.get('/plans', (req, res) => {
+
+app.get('/plans', (req, res) => { //Done by Aloysius
     // Removed p.plan_name from the SELECT statement as it's not available
     const sql = `SELECT p.plansid, p.plansname, p.difficulty, a.activityid, a.activityname
     FROM plans p
@@ -530,6 +530,7 @@ app.get('/plans', (req, res) => {
         res.render('browsePlans', { plans });
     });
 });
+
 
 
 const PORT = process.env.PORT || 3000;
