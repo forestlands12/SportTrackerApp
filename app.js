@@ -93,8 +93,16 @@ const validateRegistration = (req, res, next) => {
 };
 
 // Define routes
-app.get('/',  (req, res) => {
-    res.render('index', {user: req.session.user} );
+app.get('/', (req, res) => {
+    if (req.session.user) {
+        if (req.session.user.role === 'admin') {
+            res.redirect('/dashboard');
+        } else {
+            res.redirect('/activities');
+        }
+    } else {
+        res.render('index', { user: null });
+    }
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
