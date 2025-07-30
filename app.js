@@ -365,7 +365,7 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
 });
 
 app.get('/goal-log', (req, res) => {
-  res.render('goalLog'); // Make sure this file exists as views/goalLog.ejs
+  res.render('goal-log');
 });
 
 
