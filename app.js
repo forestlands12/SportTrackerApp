@@ -340,11 +340,11 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
-app.get('/log-workout', checkAuthenticated, (req, res) => {
+app.get('/log/new', checkAuthenticated, (req, res) => {
     res.render('workout-log', { user: req.session.user });
 });
 
-app.post('/log-workout', checkAuthenticated, (req, res) => {
+app.post('/log/new', checkAuthenticated, (req, res) => {
     const { workout_type, duration, calories_burned, intensity } = req.body;
     const workout_date = new Date(); // Get current date
 
