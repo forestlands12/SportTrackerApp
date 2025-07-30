@@ -433,6 +433,21 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.post('/profile/upload', upload.single('profile_picture'), (req, res) => {
+    const userId = req.session.user.id;
+    const filename = req.file.filename;
+
+    const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
+    connection.query(sql, [filename, userId], (err, result) => {
+        if (err) throw err;
+
+        // Update session
+        req.session.user.profile_picture = filename;
+
+        res.redirect('/profile');
+    });
+});
+
 app.get('/goal-log', (req, res) => {
   const goals = []; 
   res.render('goal-log', { goals });
@@ -575,6 +590,7 @@ app.get('/addPlans', (req, results) => {
         res.render('addPlans', { plans });
     });
 });
+
 
 
 const PORT = process.env.PORT || 3000;
