@@ -471,9 +471,20 @@ app.post('/add-goal', checkAuthenticated,(req, res) => {
 });
 
 
-app.get('/workout-log', (req, res) => {
-  const workout_log = []; 
-  res.render('workout-log', { workout_log });
+app.get('/workout-log', checkAuthenticated, (req, res) => {
+    const sql = 'SELECT * FROM workout_log WHERE user_id = ?';
+
+    connection.query(sql, [req.session.user.id], (err, results) => {
+        if (err) {
+            console.error('Error fetching workouts:', err);
+            return res.status(500).send('Database error');
+        }
+
+        res.render('workout-log', {
+            workout_log: results,
+            user: req.session.user
+        });
+    });
 });
 
 
