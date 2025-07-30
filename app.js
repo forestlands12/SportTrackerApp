@@ -438,11 +438,6 @@ app.get('/goal-log', (req, res) => {
   res.render('goal-log', { goals });
 });
 
-app.get('/goals/new', checkAuthenticated, (req, res) => {
-  res.render('goal-log'); // Or whatever EJS view you want to show for adding a new goal
-});
-
-
 app.post('/add-goal', checkAuthenticated,(req, res) => {
   const { description, status } = req.body;
   const userId = req.session.user.id; // or however you're storing the logged-in user
@@ -524,7 +519,7 @@ app.get('/plans', (req, res) => { //Done by Aloysius
                     difficulty: row.difficulty,
                     activities: []
                 };
-            }
+            };
             // Add activities to the corresponding plan
             plans[row.plansid].activities.push({
                 id: row.activityid,
@@ -558,6 +553,26 @@ app.post('/log-workout', checkAuthenticated, (req, res) => {
             return res.status(500).send('Database error');
         }
         res.redirect('/log-workout');  // Redirect back to the log workout page after submission
+    });
+});
+app.get('/addPlans', (req, results) => {
+    const sql = `SELECT p.plansid, p.plansname, p.difficulty, a.activityid, a.activityname
+    FROM plans p
+    JOIN plans_activities pa ON p.plansid = pa.plansid
+    JOIN activities a ON pa.activitiesid = a.activityid
+    WHERE p.userid = ?`;
+    // Check if user is logged in
+    if (!req.session.user) {
+        return res.redirect('/login'); // Redirect to login if not authorized
+    };
+    const userId = req.session.user.id;
+    connection.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        };
+    
+        res.render('addPlans', { plans });
     });
 });
 
