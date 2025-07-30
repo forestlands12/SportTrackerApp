@@ -364,6 +364,11 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.get('/goal-log', (req, res) => {
+  res.render('goalLog'); // Make sure this file exists as views/goalLog.ejs
+});
+
+
 app.get('/log-workout', checkAuthenticated, (req, res) => {
     res.render('workout-log', { user: req.session.user });
 });
