@@ -391,14 +391,14 @@ app.get('/profile', checkAuthenticated, (req, res) => {
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
-    res.render('editprofile', { user: req.session.user });
+    res.render('editProfile', { user: req.session.user });
 });
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const { email, address, contact } = req.body;
-    const userId = req.session.user.user.id; // or use session ID
+    const userId = req.session.user.id;
 
-    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
     connection.query(sql, [email, address, contact, userId], (err, result) => {
         if (err) {
             console.error("Error updating profile:", err);
