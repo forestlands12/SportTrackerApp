@@ -438,11 +438,16 @@ app.get('/goal-log', (req, res) => {
   res.render('goal-log', { goals });
 });
 
+app.get('/goals/new', checkAuthenticated, (req, res) => {
+  res.render('goal-log'); // Or whatever EJS view you want to show for adding a new goal
+});
+
+
 app.post('/add-goal', checkAuthenticated,(req, res) => {
   const { description, status } = req.body;
   const userId = req.session.user.id; // or however you're storing the logged-in user
 
-  const sql = 'INSERT INTO goals (user_id, description, status) VALUES (?, ?, ?)';
+  const sql = 'INSERT INTO goals (user_id, goal, status) VALUES (?, ?, ?)';
   connection.query(sql, [userId, description, status], (err, result) => {
     if (err) {
       console.error('❌ Database error:', err); // Log actual error in console
