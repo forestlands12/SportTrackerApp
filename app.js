@@ -297,6 +297,7 @@ app.get('/addactivity', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('addActivity', {user: req.session.user } ); 
 });
 
+
 app.post('/addActivity', upload.single('video'),  (req, res) => {
     // Extract activity data from the request body
     const { name } = req.body;
@@ -379,9 +380,19 @@ app.get('/deleteActivity/:id', (req, res) => {
 });
 
 app.get('/profile', checkAuthenticated, (req, res) => {
-    const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user, summary });
+    const userId = req.session.user.id;
+
+    const sql = 'SELECT * FROM goal_table WHERE user_id = ?';
+    connection.query(sql, [userId], (err, results) => {
+        if (err) throw err;
+
+        res.render('profile', {
+            user: req.session.user,
+            goals: results
+        });
+    });
 });
+
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
     res.render('editProfile', { user: req.session.user });
@@ -402,6 +413,25 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.get('/plans', (req, res) => {
+    const sql = 'SELECT * FROM plans p JOIN plans_activities pa ON p.plansid = pa.plansid' 
+});
+
+// GET route - Display contact page
+app.get('/contact', (req, res) => {
+    res.render('contact', { user: req.session.user });
+});
+
+// POST route - Handle contact form submission
+app.post('/contact', (req, res) => {
+    const { name, email, subject, message } = req.body;
+    console.log('Contact form submitted:', { name, email, subject, message });
+    res.redirect('/contact');
+});
+
+app.get('/plan/:id', (req, res) => {
+    res.render('plan');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
