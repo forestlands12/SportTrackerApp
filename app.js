@@ -316,38 +316,22 @@ app.get('/deleteActivity/:id', (req, res) => {
 });
 
 app.get('/profile', checkAuthenticated, (req, res) => {
-    if (!req.session.user) {
-        return res.status(403).send("User not logged in.");
-    }
+    const summary = req.session.summary || [];
+    res.render('profile', { user: req.session.user, summary });
+});
 
-    const user = req.session.user;
-
-    const sql = 'SELECT * FROM activities WHERE userId = ?';
-    connection.query(sql, [user.userId], (err, results) => {
-        if (err) {
-            console.error("Database error:", err);
-            return res.status(500).send("Internal Server Error");
-        }
-
-        res.render('profile', {
-            user,
-            summary: results
-        });
-    });
+app.get('/edit-profile', checkAuthenticated, (req, res) => {
+    res.render('editProfile', { user: req.session.user });
 });
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const { email, address, contact } = req.body;
-    const userId = req.session.user.userId;
+    const userId = req.session.user.id;
 
-    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
-    connection.query(sql, [email, address, contact, userId], (err) => {
-        if (err) {
-            console.error("Error updating profile:", err);
-            return res.status(500).send('Error updating profile');
-        }
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
+    connection.query(sql, [email, address, contact, userId], (err, result) => {
+        if (err) throw err;
 
-        // Update session info so it reflects changes immediately
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
