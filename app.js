@@ -388,16 +388,22 @@ app.get('/deleteActivity/:id', (req, res) => {
 });
 
 app.get('/profile', checkAuthenticated, (req, res) => {
-    const userId = req.session.user.id;
+    const userId = req.session.user?.id;
 
     const goalQuery = 'SELECT * FROM goal_table WHERE user_id = ?';
     const summaryQuery = 'SELECT * FROM workout_log WHERE user_id = ?';
 
     connection.query(goalQuery, [userId], (err, goalResults) => {
-        if (err) throw err;
+        if (err) {
+            console.error('Goal query error:', err);
+            return res.status(500).send('Database error: goal_table');
+        }
 
         connection.query(summaryQuery, [userId], (err, summaryResults) => {
-            if (err) throw err;
+            if (err) {
+                console.error('Summary query error:', err);
+                return res.status(500).send('Database error: workout_log');
+            }
 
             res.render('profile', {
                 user: req.session.user,
