@@ -443,7 +443,7 @@ app.post('/add-goal', checkAuthenticated,(req, res) => {
   const userId = req.session.user.id; // or however you're storing the logged-in user
 
   const sql = 'INSERT INTO goals (user_id, description, status) VALUES (?, ?, ?)';
-  connection.query(sql, [userId, description, status], (err, result) => {
+  db.query(sql, [userId, description, status], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Database error');
