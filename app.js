@@ -326,16 +326,16 @@ app.get('/edit-profile', checkAuthenticated, (req, res) => {
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const { email, address, contact } = req.body;
-    const userId = req.session.user.userId; // or use session ID
+    const userId = req.session.user.userId;
 
     const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
-    connection.query(sql, [email, address, contact, userId], (err, result) => {
+    connection.query(sql, [email, address, contact, userId], (err) => {
         if (err) {
             console.error("Error updating profile:", err);
             return res.status(500).send('Error updating profile');
         }
 
-        // Update session user so profile page shows new info
+        // Update session info so it reflects changes immediately
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
@@ -343,6 +343,7 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
         res.redirect('/profile');
     });
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
