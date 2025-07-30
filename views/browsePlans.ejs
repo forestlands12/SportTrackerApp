@@ -45,18 +45,27 @@
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav">
           <li class="nav-item">
-              <a class="nav-link" href="/contact">Contact</a>
-            </li>
+            <a class="nav-link" href="/contact">Contact</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="/summary">View Summary</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/profile">Profile</a>
           </li>
+          <!-- Combined View Plans and Add New Plan into a dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Plans
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="/plans">View All Plans</a></li>
+              <li><a class="dropdown-item" href="/addPlans">Create New Plan</a></li>
+            </ul>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
           </li>
-          <!-- The "View Details" link for a specific plan should be inside the loop -->
         </ul>
       </div>
     </div>
