@@ -491,6 +491,30 @@ app.post('/workout-log', checkAuthenticated, (req, res) => {
     });
 });
 
+app.post('/workout-log', checkAuthenticated, (req, res) => {
+    const { workout_type, duration, calories_burned, intensity } = req.body;
+    const workout_date = new Date();
+
+    const sql = `INSERT INTO workout_log (user_id, workout_type, duration, calories_burned, intensity, workout_date) 
+                 VALUES (?, ?, ?, ?, ?, ?)`;
+
+    connection.query(sql, [
+        req.session.user.id,
+        workout_type,
+        duration,
+        calories_burned,
+        intensity,
+        workout_date
+    ], (err, result) => {
+        if (err) {
+            console.error('Insert error:', err);
+            return res.status(500).send('Database error');
+        }
+
+        res.redirect('/log-workout');
+    });
+});
+
 
 // GET route - Display contact page
 app.get('/contact', (req, res) => {
