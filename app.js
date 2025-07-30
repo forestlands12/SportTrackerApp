@@ -402,12 +402,30 @@ app.post('/contact', (req, res) => {
     });
 });
 
-app.get('/plan/:id', (req, res) => {
-    res.render('plan');
-});
+app.get('/plans', (req, res) => {
+    const sql = 'SELECT p.plan_id, p.plan_name, a.activity_id, a.activity_name FROM plans p JOIN plan_activities pa ON p.plan_id = pa.plan_id JOIN activities a ON pa.activity_id = a.activity_id WHERE p.user_id = ?';
+    connection.query(sql, [userId], (err, resutlts) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
 
-app.get('/browse-plans', (req, res) => {
-    res.render('browsePlans');
+        const plans = {};
+        results.forEach(row => {
+            if (!plans[row.plan_id]) {
+                plans[row.plan_id] = {
+                    plan_name: row.plan_name,
+                    activities: []
+                };
+            }
+            plans[row.plan_id].activities.push({
+                id: row.activity_id,
+                name: row.activity_name
+            });
+        });
+
+        res.render('browsePlans', { plans });
+    });
 });
 
 const PORT = process.env.PORT || 3000;
