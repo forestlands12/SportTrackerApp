@@ -234,6 +234,7 @@ app.get('/addActivity', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('addActivity', {user: req.session.user } ); 
 });
 
+
 app.post('/addActivity', upload.single('video'),  (req, res) => {
     // Extract activity data from the request body
     const { name } = req.body;
@@ -354,6 +355,27 @@ app.post('/log-workout', checkAuthenticated, (req, res) => {
         if (err) throw err;
         res.redirect('/log-workout');  // Redirect back to log workout page after submission
     });
+});
+
+// GET route - Display contact page
+app.get('/contact', (req, res) => {
+    res.render('contact', { user: req.session.user });
+});
+
+// POST route - Handle contact form submission
+app.post('/contact', (req, res) => {
+    const { name, email, subject, message } = req.body;
+    
+    // Log the contact form data (you can save to database later if needed)
+    console.log('Contact form submitted:');
+    console.log('Name:', name);
+    console.log('Email:', email);
+    console.log('Subject:', subject);
+    console.log('Message:', message);
+    console.log('Submitted at:', new Date());
+    
+    
+    res.redirect('/contact');
 });
 
 const PORT = process.env.PORT || 3000;
