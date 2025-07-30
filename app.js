@@ -344,5 +344,9 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.get('/plans', (req, res) => {
+    const sql = 'SELECT * FROM plans p JOIN plans_activities pa ON p.plansid = pa.plansid' 
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
