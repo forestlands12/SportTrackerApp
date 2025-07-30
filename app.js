@@ -93,8 +93,16 @@ const validateRegistration = (req, res, next) => {
 };
 
 // Define routes
-app.get('/',  (req, res) => {
-    res.render('index', {user: req.session.user} );
+app.get('/', (req, res) => {
+    if (req.session.user) {
+        if (req.session.user.role === 'admin') {
+            res.redirect('/dashboard');
+        } else {
+            res.redirect('/activities');
+        }
+    } else {
+        res.render('index', { user: null });
+    }
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
@@ -379,21 +387,25 @@ app.get('/deleteActivity/:id', (req, res) => {
 
 app.get('/profile', checkAuthenticated, (req, res) => {
     const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user, summary });
+    res.render('profile', { user: req.session.user });
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
-    res.render('editProfile', { user: req.session.user });
+    res.render('editprofile', { user: req.session.user });
 });
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const { email, address, contact } = req.body;
-    const userId = req.session.user.id;
+    const userId = req.session.user.userId; // or use session ID
 
-    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
     connection.query(sql, [email, address, contact, userId], (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.error("Error updating profile:", err);
+            return res.status(500).send('Error updating profile');
+        }
 
+        // Update session user so profile page shows new info
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
@@ -402,6 +414,9 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.get('/plans', (req, res) => {
+    const sql = 'SELECT * FROM plans p JOIN plans_activities pa ON p.plansid = pa.plansid' 
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
