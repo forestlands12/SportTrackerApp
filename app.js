@@ -414,6 +414,24 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.get('/goal-log', checkAuthenticated, (req, res) => {
+    const sql = 'SELECT * FROM goal_table WHERE user_id = ?'; // Assuming 'user_id' is part of the table
+    connection.query(sql, [req.session.user.id], (err, results) => {
+        if (err) throw err;
+        res.render('goal-log', { user: req.session.user, goals: results });
+    });
+});
+
+app.post('/goal-log', checkAuthenticated, (req, res) => {
+    const { goalDescription, targetDate } = req.body;
+    const sql = 'INSERT INTO goal_table (goal, target_date, user_id) VALUES (?, ?, ?)';
+    connection.query(sql, [goalDescription, targetDate, req.session.user.id], (err, result) => {
+        if (err) throw err;
+        res.redirect('/goal-log');
+    });
+});
+
+
 app.get('/plans', (req, res) => {
     const sql = 'SELECT * FROM plans p JOIN plans_activities pa ON p.plansid = pa.plansid' 
 });
