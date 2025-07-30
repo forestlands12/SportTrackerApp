@@ -1,21 +1,21 @@
-<!-- FILE: views/admin/add-activity.ejs -->
+<!-- FILE: views/addActivity.ejs -->
 
-<%- include('../partials/header', { title: 'Add New Activity' }) %>
+<%- include('partials/header', { title: 'Add New Activity' }) %>
 
 <div class="container mt-4" style="max-width: 800px;">
-    <div class="card p-4 p-md-5">
+    <div class="card p-4 p-md-5 shadow-sm">
         <h2 class="text-center mb-4">Add New Activity</h2>
         <form action="/admin/activities/add" method="POST" enctype="multipart/form-data">
 
             <!-- Activity Name -->
             <div class="mb-3">
-                <label for="activityName" class="form-label">Activity Name</label>
+                <label for="activityName" class="form-label fw-bold">Activity Name</label>
                 <input type="text" class="form-control" id="activityName" name="activityName" placeholder="e.g., Bench Press, 5k Run" required>
             </div>
 
             <!-- Difficulty -->
             <div class="mb-3">
-                <label for="difficulty" class="form-label">Difficulty</label>
+                <label for="difficulty" class="form-label fw-bold">Difficulty</label>
                 <select class="form-select" id="difficulty" name="difficulty" required>
                     <option value="Easy">Easy</option>
                     <option value="Medium" selected>Medium</option>
@@ -46,13 +46,13 @@
 
             <!-- Progression Notes -->
             <div class="mb-3">
-                <label for="progression" class="form-label">Progression Notes</label>
+                <label for="progression" class="form-label fw-bold">Progression Notes</label>
                 <textarea class="form-control" id="progression" name="progression" rows="3" placeholder="Describe how a user can make this activity harder over time. e.g., 'Add 2.5kg to the bar each week.'"></textarea>
             </div>
 
             <!-- File Upload -->
             <div class="mb-4">
-                <label for="video" class="form-label">Activity Image/Video</label>
+                <label for="video" class="form-label fw-bold">Activity Demonstration</label>
                 <input class="form-control" type="file" id="video" name="video">
             </div>
 
@@ -64,4 +64,4 @@
     </div>
 </div>
 
-<%- include('../partials/footer') %>
+<%- include('partials/footer') %>
