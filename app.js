@@ -519,7 +519,7 @@ app.get('/plans', (req, res) => { //Done by Aloysius
                     difficulty: row.difficulty,
                     activities: []
                 };
-            }
+            };
             // Add activities to the corresponding plan
             plans[row.plansid].activities.push({
                 id: row.activityid,
@@ -531,6 +531,50 @@ app.get('/plans', (req, res) => { //Done by Aloysius
     });
 });
 
+app.get('/log-workout', checkAuthenticated, (req, res) => {
+    const sql = 'SELECT * FROM workouts WHERE user_id = ?';
+    connection.query(sql, [req.session.user.id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+        res.render('workout-log', { workouts: results, user: req.session.user });
+    });
+}); 
+
+app.post('/log-workout', checkAuthenticated, (req, res) => {
+    const { workout_type, duration, calories_burned, intensity } = req.body;
+    const workout_date = new Date(); // Get current date
+
+    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
+    connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+        res.redirect('/log-workout');  // Redirect back to the log workout page after submission
+    });
+});
+app.get('/addPlans', (req, results) => {
+    const sql = `SELECT p.plansid, p.plansname, p.difficulty, a.activityid, a.activityname
+    FROM plans p
+    JOIN plans_activities pa ON p.plansid = pa.plansid
+    JOIN activities a ON pa.activitiesid = a.activityid
+    WHERE p.userid = ?`;
+    // Check if user is logged in
+    if (!req.session.user) {
+        return res.redirect('/login'); // Redirect to login if not authorized
+    };
+    const userId = req.session.user.id;
+    connection.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        };
+    
+        res.render('addPlans', { plans });
+    });
+});
 
 
 const PORT = process.env.PORT || 3000;
