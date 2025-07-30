@@ -78,7 +78,7 @@
         <% for(let i=0; i < activities.length; i++) { %>
           <tr>
             <td><a href="/activities/<%= activities[i].activityId %>" ><%= activities[i].activityName %></a></td>
-            <td><img src = "videos/<%= activities[i].video %>" width="20%"></td>
+            <td><img src = "images/<%= activities[i].image %>" width="20%"></td>
             <!-- Edit Link -->
             <td><a href="/updateActivity/<%= activities[i].activityId %>">Edit</a></td>
             <!-- Delete Link -->
