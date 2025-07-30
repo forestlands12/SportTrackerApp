@@ -481,7 +481,7 @@ app.post('/contact', (req, res) => {
 });
 
 app.get('/plans', (req, res) => {
-    const sql = 'SELECT p.plan_id, p.difficulty, a.activityid, a.activityname FROM plans p JOIN plan_activities pa ON p.plansid = pa.plan_id JOIN activities a ON pa.activity_id = a.activityid WHERE p.userid = ?';
+    const sql = 'SELECT p.plan_id, p.difficulty, a.activityid, a.activityname FROM plans p JOIN plan_activities pa ON p.plansid = pa.plansid JOIN activities a ON pa.activitiesid = a.activityid WHERE p.userid = ?';
     if (!req.session.user) {
         return res.redirect('/login'); // or handle unauthorized access
     };
