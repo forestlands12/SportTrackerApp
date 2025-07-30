@@ -369,5 +369,9 @@ app.post('/contact', (req, res) => {
     res.redirect('/contact');
 });
 
+app.get('/plan/:id', (req, res) => {
+    res.render('plan');
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
