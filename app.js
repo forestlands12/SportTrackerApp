@@ -366,7 +366,7 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
 
 app.get('/goal-log', (req, res) => {
   const goals = []; 
-  res.render('goal-log');
+  res.render('goal-log', { goals });
 });
 
 
