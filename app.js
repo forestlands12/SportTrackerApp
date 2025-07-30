@@ -94,7 +94,10 @@ const validateRegistration = (req, res, next) => {
 
 // Define routes
 app.get('/',  (req, res) => {
-    res.render('index', {user: req.session.user} );
+    connection.query('SELECT * FROM activities', (error, results) => {
+        if (error) throw error;
+        res.render('activities', { user: req.session.user, activities: results });
+      });
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
