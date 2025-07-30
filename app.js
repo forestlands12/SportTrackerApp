@@ -413,11 +413,27 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
-app.get('/plans', (req, res) => {
-    const sql = 'SELECT * FROM user u JOIN userplans up ON u.id = up.userid JOIN plans_activity pa ON up.plans_activityid = pa.id JOIN activity a ON a.activityid = pa.activity_id JOIN plans p ON p.plansid = pa.plans_id';
-    connection.query(sql, [activityName, video, difficulty], (err, resutlts) => {
+app.get('/goal-log', (req, res) => {
+  const goals = []; 
+  res.render('goal-log', { goals });
+});
 
-    });
+app.post('/add-goal', checkAuthenticated,(req, res) => {
+  const { description, status } = req.body;
+  const userId = req.session.user.id; // or however you're storing the logged-in user
+
+  const sql = 'INSERT INTO goals (user_id, description, status) VALUES (?, ?, ?)';
+  connection.query(sql, [userId, description, status], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error');
+    }
+
+    res.redirect('/goal-log'); // or wherever you want to redirect after saving
+  });
+});
+
+
 app.get('/log-workout', checkAuthenticated, (req, res) => {
     res.render('workout-log', { user: req.session.user });
 });
