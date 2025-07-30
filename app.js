@@ -604,7 +604,7 @@ app.post('/addPlans', (req, res) => {
         return res.status(400).send('Plan name and difficulty are required.');
     }
 
-    const newPlanId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    const newPlanId = Date.now();
 
     connection.beginTransaction(err => {
         if (err) {
