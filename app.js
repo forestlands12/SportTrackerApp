@@ -494,7 +494,7 @@ app.post('/contact', (req, res) => {
 
 app.get('/plans', (req, res) => {
     // Removed p.plan_name from the SELECT statement as it's not available
-    const sql = `SELECT p.plansid, p.difficulty, a.activityid, a.activityname
+    const sql = `SELECT p.plansid, p.plansname, p.difficulty, a.activityid, a.activityname
     FROM plans p
     JOIN plans_activities pa ON p.plansid = pa.plansid
     JOIN activities a ON pa.activitiesid = a.activityid
@@ -517,7 +517,7 @@ app.get('/plans', (req, res) => {
             if (!plans[row.plansid]) {
                 // Store plan details, using planId as the primary identifier
                 plans[row.plansid] = {
-                    id: row.plansid, // Store the plan ID
+                    name: row.plansname, // Store the plan ID
                     difficulty: row.difficulty,
                     activities: []
                 };
