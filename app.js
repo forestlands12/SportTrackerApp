@@ -577,29 +577,23 @@ app.post('/log-workout', checkAuthenticated, (req, res) => {
     });
 });
 
-// GET route to display the Add Plan form
-app.get('/addPlans', (req, res) => {
+app.get('/addPlans', (req, res) => { //Done by Aloysius
     // Ensure user is logged in before accessing this page
     if (!req.session.user) {
         return res.redirect('/login');
     }
-
-    // Fetch all existing activities from the database to populate the checkboxes
     const sqlActivities = `SELECT activityid, activityname, difficulty FROM activities`;
     connection.query(sqlActivities, (err, activities) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Database error fetching activities');
         }
-        // Render the addPlans.ejs template, passing the fetched activities data
         res.render('addPlans', { activities });
     });
 });
 
 
-// --- Route to Handle New Plan Form Submission ---
-app.post('/addPlans', (req, res) => {
-    // Ensure user is logged in before processing form submission
+app.post('/addPlans', (req, res) => { //Done by Aloysius
     if (!req.session.user) {
         return res.redirect('/login');
     }
