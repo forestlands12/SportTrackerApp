@@ -318,7 +318,22 @@ app.get('/deleteActivity/:id', (req, res) => {
 
 app.get('/profile', checkAuthenticated, (req, res) => {
     const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user, summary });
+    const userId = req.session.user.id;
+
+    const sql = 'SELECT * FROM goal_table WHERE user_id = ?';
+
+    connection.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching goals:', err);
+            return res.status(500).send('Error loading profile');
+        }
+
+        res.render('profile', {
+            user: req.session.user,
+            summary,
+            goals: results || [] 
+        });
+    });
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
