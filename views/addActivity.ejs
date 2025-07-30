@@ -5,7 +5,8 @@
 <div class="container mt-4" style="max-width: 800px;">
     <div class="card p-4 p-md-5 shadow-sm">
         <h2 class="text-center mb-4">Add New Activity</h2>
-        <form action="/admin/activities/add" method="POST" enctype="multipart/form-data">
+        <!-- The action attribute is now updated to the simpler path -->
+        <form action="/addactivity" method="POST" enctype="multipart/form-data">
 
             <!-- Activity Name -->
             <div class="mb-3">
