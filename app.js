@@ -394,7 +394,6 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
     connection.query(sql, [email, address, contact, userId], (err, result) => {
         if (err) throw err;
-
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
