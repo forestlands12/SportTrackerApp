@@ -433,29 +433,17 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
-app.post('/profile/upload', checkAuthenticated, upload.single('profile_picture'), (req, res) => {
+app.post('/profile/upload', upload.single('profile_picture'), (req, res) => {
     const userId = req.session.user.id;
-
-    // If no file uploaded, redirect back
-    if (!req.file) {
-        req.flash('error', 'No file uploaded.');
-        return res.redirect('/profile');
-    }
-
-    const profilePicPath = '/images/' + req.file.filename;
+    const filename = req.file.filename;
 
     const sql = 'UPDATE users SET profile_picture = ? WHERE id = ?';
-    connection.query(sql, [profilePicPath, userId], (err, result) => {
-        if (err) {
-            console.error('Error updating profile picture:', err);
-            req.flash('error', 'Upload failed.');
-            return res.redirect('/profile');
-        }
+    connection.query(sql, [filename, userId], (err, result) => {
+        if (err) throw err;
 
-        // Update session user object too
-        req.session.user.profilePicture = profilePicPath;
+        // Update session
+        req.session.user.profile_picture = filename;
 
-        req.flash('success', 'Profile picture updated!');
         res.redirect('/profile');
     });
 });
@@ -602,29 +590,7 @@ app.get('/addPlans', (req, res) => {
     });
 });
 
-// Add this import at the very top of your app.js file
-import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 
-// GET route to display the Add Plan form
-app.get('/addPlans', (req, res) => {
-    // Ensure user is logged in before accessing this page
-    if (!req.session.user) {
-        return res.redirect('/login');
-    }
-
-    // Fetch all existing activities from the database to populate the checkboxes
-    const sqlActivities = `SELECT activityid, activityname, difficulty FROM activities`;
-    connection.query(sqlActivities, (err, activities) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Database error fetching activities');
-        }
-        // Render the addPlans.ejs template, passing the fetched activities data
-        res.render('addPlans', { activities });
-    });
-});
-
-// POST route to handle the Add Plan form submission
 app.post('/addPlans', (req, res) => {
     // Ensure user is logged in before processing form submission
     if (!req.session.user) {
@@ -640,9 +606,6 @@ app.post('/addPlans', (req, res) => {
         return res.status(400).send('Plan name and difficulty are required.');
     }
 
-    // Generate a unique ID for the new plan since plansid is not AUTO_INCREMENT
-    const newPlanId = uuidv4(); // Generate a UUID
-
     // Start a database transaction for atomicity. This ensures either both
     // the plan and its activities are saved, or neither are.
     connection.beginTransaction(err => {
@@ -652,9 +615,9 @@ app.post('/addPlans', (req, res) => {
         }
 
         // 1. Insert the new plan details into the 'plans' table
-        // Now explicitly including 'plansid' in the INSERT statement
-        const insertPlanSql = `INSERT INTO plans (plansid, plan_name, difficulty, userid) VALUES (?, ?, ?, ?)`;
-        connection.query(insertPlanSql, [newPlanId, planName, difficulty, userId], (err, result) => {
+        // Note: 'plan_name' is used here as it's the field from the form input
+        const insertPlanSql = `INSERT INTO plans (plansname, difficulty, userid) VALUES (?, ?, ?)`;
+        connection.query(insertPlanSql, [planName, difficulty, userId], (err, result) => {
             if (err) {
                 // Rollback the transaction if plan insertion fails
                 return connection.rollback(() => {
@@ -662,6 +625,8 @@ app.post('/addPlans', (req, res) => {
                     res.status(500).send('Error adding plan.');
                 });
             }
+
+            const newPlanId = result.insertId; // Get the ID of the newly created plan
 
             // Ensure selectedActivities is always an array, even if only one item is selected
             const activitiesToInsert = Array.isArray(selectedActivities) ? selectedActivities : [selectedActivities];
@@ -680,7 +645,7 @@ app.post('/addPlans', (req, res) => {
             }
 
             // 2. Insert the selected activities into the 'plan_activities' junction table
-            const insertPlanActivitiesSql = `INSERT INTO plan_activities (plansid, activitiesid) VALUES ?`;
+            const insertPlanActivitiesSql = `INSERT INTO plans_activities (plansid, activitiesid) VALUES ?`;
             // Map the selected activity IDs to the format required for bulk insertion
             const values = activitiesToInsert.map(activityId => [newPlanId, activityId]);
 
@@ -706,7 +671,6 @@ app.post('/addPlans', (req, res) => {
         });
     });
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
