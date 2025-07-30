@@ -67,16 +67,22 @@
   <div class="container form-container">
     <h2 class="mb-4">Add a New Goal</h2>
     <form action="/add-goal" method="POST">
-      <div class="mb-3">
-        <label for="goalDescription" class="form-label">Goal Description</label>
-        <input type="text" class="form-control" id="goalDescription" name="description" required>
-      </div>
-      <div class="mb-3">
-        <label for="targetDate" class="form-label">Target Date</label>
-        <input type="date" class="form-control" id="targetDate" name="targetDate" required>
-      </div>
-      <button type="submit" class="btn btn-primary">Add Goal</button>
-    </form>
+    <div class="mb-3">
+      <label for="description" class="form-label">Goal Description</label>
+      <input type="text" class="form-control" id="description" name="description" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="status" class="form-label">Status</label>
+      <select class="form-select" id="status" name="status" required>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </div>
+
+  <button type="submit" class="btn btn-primary">Add Goal</button>
+</form>
+
 
     <hr class="my-5">
 
