@@ -32,11 +32,15 @@
       </div>
     </div>
   </nav>
-  <% for(var i = 0; i<activity.length; i++) {%>
-    <div class="card">
-      <div class="container col-3">
-        
-      </div>
+    <% Object.entries(plans).forEach(([planId, plan]) => { %>
+    <div class="plan">
+        <h2><%= plan.plan_name %></h2>
+        <ul>
+            <% plan.activities.forEach(activity => { %>
+                <li><%= activity.name %></li>
+            <% }) %>
+        </ul>
     </div>
+  <% }) %>
 </body>
 </html>
