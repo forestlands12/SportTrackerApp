@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Workout</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">SportTracker App</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/activities">Activities</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/summary">View Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h1 class="mb-4">Log Your Workout</h1>
+
+        <!-- Workout Log Form -->
+        <form action="/log-workout" method="POST">
+            <div class="form-group mb-3">
+                <label for="workout_type">Workout Type:</label>
+                <select id="workout_type" name="workout_type" class="form-control" required>
+                    <option value="Running">Running</option>
+                    <option value="Weightlifting">Weightlifting</option>
+                    <option value="Cycling">Cycling</option>
+                    <option value="Yoga">Yoga</option>
+                    <option value="Swimming">Swimming</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="duration">Duration (minutes):</label>
+                <input type="number" id="duration" name="duration" class="form-control" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="calories_burned">Calories Burned:</label>
+                <input type="number" id="calories_burned" name="calories_burned" class="form-control" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="intensity">Intensity Level:</label>
+                <select id="intensity" name="intensity" class="form-control" required>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Log Workout</button>
+        </form>
+
+        <hr>
+
+        <!-- Display Logged Workouts -->
+        <h3 class="mt-5">Your Logged Workouts</h3>
+        <% if (workouts && workouts.length > 0) { %>
+            <ul class="list-group">
+                <% workouts.forEach(function(workout) { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong><%= workout.workout_type %></strong> <br>
+                            <small>Duration: <%= workout.duration %> mins</small> <br>
+                            <small>Calories Burned: <%= workout.calories_burned %> kcal</small> <br>
+                            <small>Intensity: <%= workout.intensity %></small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">
+                            <%= new Date(workout.workout_date).toLocaleDateString() %>
+                        </span>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>You haven't logged any workouts yet. Start by adding one!</p>
+        <% } %>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 mt-4">
+        <div class="container text-center">
+            <p>&copy; 2025 SportTracker App. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

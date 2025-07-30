@@ -8,10 +8,30 @@
   <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
   <style>
       body {
-        background-image: url('/videos/Republic Polytechnic 2102 (1).png');
-        background-size: cover;
-        background-attachment: fixed;
-      }
+      background-image: url('/images/Exercise_Final.png');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      min-height: 100vh;
+    }
+    
+    .content-box {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 30px;
+      margin-top: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .navbar {
+      background-color: rgba(33, 37, 41, 0.9) !important;
+      backdrop-filter: blur(5px);
+    }
+    
+    .table {
+      background-color: white;
+    }
   </style>
 </head>
 <body>
@@ -39,7 +59,7 @@
   </nav>
 
   <!-- Main Content -->
-  <div class="container mt-4">
+  <div class="container mt-4 content-box">
     <!-- Welcome Section -->
     <div class="row">
       <div class="col-md-6">
@@ -48,7 +68,7 @@
         <p><strong>Address:</strong> <%= user.address %></p>
         <p><strong>Contact:</strong> <%= user.contact %></p>
         <p><strong>Role:</strong> <%= user.role %></p>
-        <a href="/profile/edit" class="btn btn-warning mt-3">Edit Profile</a>
+        <a href="/profile/edit-profile" class="btn btn-warning">Edit Profile</a>
       </div>
       <div class="col-md-6">
         <h3>Your Profile Picture</h3>
