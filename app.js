@@ -24,7 +24,8 @@ const connection = mysql.createConnection({
     port: 3306,
     user: `c237admin`,
     password: `c2372025!`,
-    database: `c237_sportstracker`
+    database: `c237_sportstracker`,
+    waitForConnections: true,
 });
 
 
@@ -107,6 +108,68 @@ app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
 
 app.get('/register', (req, res) => {
     res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
+});
+
+
+// --- ADMIN ROUTES ---
+
+// Route to show the list of all activities
+app.get('/admin/activities', checkAuthenticated, checkAdmin, (req, res) => {
+    const sql = "SELECT * FROM activities ORDER BY activityName ASC";
+    pool.query(sql, (error, results) => {
+        if (error) {
+            console.error("Database error:", error);
+            req.flash('error', 'Could not load activities.');
+            return res.render('admin/manage-activities', { activities: [] });
+        }
+        res.render('admin/manage-activities', { activities: results });
+    });
+});
+
+// Route to show the form for adding a new activity
+app.get('/addactivity', checkAuthenticated, checkAdmin, (req, res) => {
+    res.render('addActivity');
+});
+
+// ==== POST SESSION ====
+
+// This route corresponds to the detailed form in 'addActivity.ejs'
+app.post('/addactivity', checkAuthenticated, checkAdmin, upload.single('video'), (req, res) => {
+    const { 
+        activityName, 
+        difficulty, 
+        rec_sets, 
+        rec_reps, 
+        rec_duration_mins, 
+        progression 
+    } = req.body;
+
+    let videoFile = req.file ? req.file.filename : null;
+
+    const sql = `
+        INSERT INTO activities 
+        (activityName, difficulty, rec_sets, rec_reps, rec_duration_mins, progression, video) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+        activityName,
+        difficulty,
+        rec_sets || null,
+        rec_reps || null,
+        rec_duration_mins || null,
+        progression,
+        videoFile
+    ];
+
+    pool.query(sql, values, (error, results) => {
+        if (error) {
+            console.error("Error adding activity:", error);
+            req.flash('error', 'Database error. Could not add activity.');
+            return res.redirect('/addactivity');
+        }
+        req.flash('success', 'New activity has been added to the library!');
+        res.redirect('/admin/activities');
+    });
 });
 
 app.post('/register', validateRegistration, (req, res) => {
@@ -230,7 +293,7 @@ app.get('/activity/:id', checkAuthenticated, (req, res) => {
   });
 });
 
-app.get('/addActivity', checkAuthenticated, checkAdmin, (req, res) => {
+app.get('/addactivity', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('addActivity', {user: req.session.user } ); 
 });
 
@@ -317,9 +380,19 @@ app.get('/deleteActivity/:id', (req, res) => {
 });
 
 app.get('/profile', checkAuthenticated, (req, res) => {
-    const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user, summary });
+    const userId = req.session.user.id;
+
+    const sql = 'SELECT * FROM goal_table WHERE user_id = ?';
+    connection.query(sql, [userId], (err, results) => {
+        if (err) throw err;
+
+        res.render('profile', {
+            user: req.session.user,
+            goals: results
+        });
+    });
 });
+
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
     res.render('editProfile', { user: req.session.user });
@@ -332,7 +405,6 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
     connection.query(sql, [email, address, contact, userId], (err, result) => {
         if (err) throw err;
-
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
@@ -341,20 +413,8 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
-app.get('/log-workout', checkAuthenticated, (req, res) => {
-    res.render('workout-log', { user: req.session.user });
-});
-
-app.post('/log-workout', checkAuthenticated, (req, res) => {
-    const { workout_type, duration, calories_burned, intensity } = req.body;
-    const workout_date = new Date(); // Get current date
-
-    // Insert workout into the database
-    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
-    connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
-        if (err) throw err;
-        res.redirect('/log-workout');  // Redirect back to log workout page after submission
-    });
+app.get('/plans', (req, res) => {
+    const sql = 'SELECT * FROM plans p JOIN plans_activities pa ON p.plansid = pa.plansid' 
 });
 
 // GET route - Display contact page
