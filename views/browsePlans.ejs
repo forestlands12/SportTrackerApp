@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <title>SportTracker App</title>
 </head>
-<body> 
+<body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">SportTracker App</a>
@@ -27,23 +27,40 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
-          </li> 
-          <li class="nav-item">
-            <a href="/plan/<%= plan.id %>">View Details</a>
           </li>
+          <!-- The "View Details" link for a specific plan should be inside the loop -->
         </ul>
       </div>
     </div>
   </nav>
-    <% Object.entries(plans).forEach(([planId, plan]) => { %>
-    <div class="plan">
-        <h2><%= plan.plan_name %></h2>
-        <ul>
+
+  <div class="container mt-4">
+    <h1 class="mb-4">Your Training Plans</h1>
+
+    <% if (Object.keys(plans).length === 0) { %>
+      <div class="alert alert-info" role="alert">
+        You don't have any training plans yet. Create one to get started!
+      </div>
+    <% } else { %>
+      <% Object.entries(plans).forEach(([planId, plan]) => { %>
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-primary text-white">
+
+          <h2 class="h5 mb-0"><%= plan.id %> <span class="badge bg-light text-dark ms-2"><%= plan.difficulty %></span></h2>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Activities:</h5>
+          <ul class="list-group list-group-flush">
             <% plan.activities.forEach(activity => { %>
-                <li><%= activity.name %></li>
+                <li class="list-group-item"><%= activity.name %></li>
             <% }) %>
-        </ul>
-    </div>
-  <% }) %>
+          </ul>
+
+          <a href="/plan/<%= plan.id %>" class="btn btn-outline-primary mt-3">View Details</a>
+        </div>
+      </div>
+      <% }) %>
+    <% } %>
+  </div>
 </body>
 </html>
