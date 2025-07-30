@@ -482,6 +482,7 @@ app.post('/contact', (req, res) => {
 
 app.get('/plans', (req, res) => {
     const sql = 'SELECT p.plan_id, p.plan_name, a.activity_id, a.activity_name FROM plans p JOIN plan_activities pa ON p.plan_id = pa.plan_id JOIN activities a ON pa.activity_id = a.activity_id WHERE p.user_id = ?';
+    const userId = req.session.user.id;
     connection.query(sql, [userId], (err, resutlts) => {
         if (err) {
             console.error(err);
