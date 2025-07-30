@@ -477,7 +477,7 @@ app.get('/workout-log', (req, res) => {
 });
 
 
-app.post('/log-workout', checkAuthenticated, (req, res) => {
+app.post('/workout-log', checkAuthenticated, (req, res) => {
     const { workout_type, duration, calories_burned, intensity } = req.body;
     const workout_date = new Date();
 
