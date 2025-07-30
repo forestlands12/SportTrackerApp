@@ -484,7 +484,7 @@ app.get('/plans', (req, res) => {
     // Removed p.plan_name from the SELECT statement as it's not available
     const sql = `SELECT p.plansid, p.difficulty, a.activityid, a.activityname
     FROM plans p
-    JOIN plan_activities pa ON p.plansid = pa.plansid
+    JOIN plans_activities pa ON p.plansid = pa.plansid
     JOIN activities a ON pa.activitiesid = a.activityid
     WHERE p.userid = ?`;
 
