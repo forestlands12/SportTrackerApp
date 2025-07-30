@@ -570,28 +570,107 @@ app.post('/log-workout', checkAuthenticated, (req, res) => {
         res.redirect('/log-workout');  // Redirect back to the log workout page after submission
     });
 });
-app.get('/addPlans', (req, results) => {
-    const sql = `SELECT p.plansid, p.plansname, p.difficulty, a.activityid, a.activityname
-    FROM plans p
-    JOIN plans_activities pa ON p.plansid = pa.plansid
-    JOIN activities a ON pa.activitiesid = a.activityid
-    WHERE p.userid = ?`;
-    // Check if user is logged in
+
+// GET route to display the Add Plan form
+app.get('/addPlans', (req, res) => {
+    // Ensure user is logged in before accessing this page
     if (!req.session.user) {
-        return res.redirect('/login'); // Redirect to login if not authorized
-    };
-    const userId = req.session.user.id;
-    connection.query(sql, [userId], (err, results) => {
+        return res.redirect('/login');
+    }
+
+    // Fetch all existing activities from the database to populate the checkboxes
+    const sqlActivities = `SELECT activityid, activityname, difficulty FROM activities`;
+    connection.query(sqlActivities, (err, activities) => {
         if (err) {
             console.error(err);
-            return res.status(500).send('Database error');
-        };
-    
-        res.render('addPlans', { plans });
+            return res.status(500).send('Database error fetching activities');
+        }
+        // Render the addPlans.ejs template, passing the fetched activities data
+        res.render('addPlans', { activities });
     });
 });
 
+// POST route to handle the Add Plan form submission
+app.post('/addPlans', (req, res) => {
+    // Ensure user is logged in before processing form submission
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
 
+    // Destructure data from the request body
+    const { planName, difficulty, selectedActivities } = req.body;
+    const userId = req.session.user.id;
+
+    // Basic validation for required fields
+    if (!planName || !difficulty) {
+        return res.status(400).send('Plan name and difficulty are required.');
+    }
+
+    // Start a database transaction for atomicity. This ensures either both
+    // the plan and its activities are saved, or neither are.
+    connection.beginTransaction(err => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Failed to start transaction.');
+        }
+
+        // 1. Insert the new plan details into the 'plans' table
+        // Note: 'plan_name' is used here as it's the field from the form input
+        const insertPlanSql = `INSERT INTO plans (plansname, difficulty, userid) VALUES (?, ?, ?)`;
+        connection.query(insertPlanSql, [planName, difficulty, userId], (err, result) => {
+            if (err) {
+                // Rollback the transaction if plan insertion fails
+                return connection.rollback(() => {
+                    console.error(err);
+                    res.status(500).send('Error adding plan.');
+                });
+            }
+
+            const newPlanId = result.insertId; // Get the ID of the newly created plan
+
+            // Ensure selectedActivities is always an array, even if only one item is selected
+            const activitiesToInsert = Array.isArray(selectedActivities) ? selectedActivities : [selectedActivities];
+
+            // Handle case where no activities were selected for the plan
+            if (activitiesToInsert.length === 0 || activitiesToInsert[0] === undefined) {
+                // Commit the transaction for the plan creation, even without activities
+                return connection.commit(commitErr => {
+                    if (commitErr) {
+                        console.error(commitErr);
+                        return res.status(500).send('Error committing transaction for plan without activities.');
+                    }
+                    console.log(`Plan "${planName}" added successfully with no activities.`);
+                    res.redirect('/plans'); // Redirect to the plans list
+                });
+            }
+
+            // 2. Insert the selected activities into the 'plan_activities' junction table
+            const insertPlanActivitiesSql = `INSERT INTO plans_activities (plansid, activitiesid) VALUES ?`;
+            // Map the selected activity IDs to the format required for bulk insertion
+            const values = activitiesToInsert.map(activityId => [newPlanId, activityId]);
+
+            connection.query(insertPlanActivitiesSql, [values], (err, result) => {
+                if (err) {
+                    // Rollback if linking activities fails
+                    return connection.rollback(() => {
+                        console.error(err);
+                        res.status(500).send('Error linking activities to plan.');
+                    });
+                }
+
+                // 3. Commit the entire transaction if both plan and activities are successfully linked
+                connection.commit(commitErr => {
+                    if (commitErr) {
+                        console.error(commitErr);
+                        return res.status(500).send('Error committing transaction.');
+                    }
+                    console.log(`Plan "${planName}" added successfully with activities.`);
+                    res.redirect('/plans'); // Redirect to the plans list
+                });
+            });
+        });
+    });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port https://localhost:${PORT}`));
