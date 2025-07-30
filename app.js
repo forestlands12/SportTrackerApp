@@ -94,10 +94,7 @@ const validateRegistration = (req, res, next) => {
 
 // Define routes
 app.get('/',  (req, res) => {
-        connection.query('SELECT * FROM activities', (error, results) => {
-        if (error) throw error;
-        res.render('index', {user: req.session.user, activities: results} );
-      });
+    res.render('index', {user: req.session.user} );
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
@@ -160,6 +157,14 @@ app.post('/login', (req, res) => {
             res.redirect('/login');
         }
     });
+});
+
+app.get('/activities', checkAuthenticated, (req, res) => {
+    // Fetch data from MySQL
+    connection.query('SELECT * FROM activities', (error, results) => {
+        if (error) throw error;
+        res.render('activities', { user: req.session.user, activities: results });
+      });
 });
 
 app.post('/track-activity/:id', checkAuthenticated, (req, res) => {
@@ -332,22 +337,6 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
         req.session.user.contact = contact;
 
         res.redirect('/profile');
-    });
-});
-
-app.get('/log-workout', checkAuthenticated, (req, res) => {
-    res.render('workout-log', { user: req.session.user });
-});
-
-app.post('/log-workout', checkAuthenticated, (req, res) => {
-    const { workout_type, duration, calories_burned, intensity } = req.body;
-    const workout_date = new Date(); // Get current date
-
-    // Insert workout into the database
-    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
-    connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
-        if (err) throw err;
-        res.redirect('/log-workout');  // Redirect back to log workout page after submission
     });
 });
 
