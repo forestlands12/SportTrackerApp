@@ -487,7 +487,7 @@ app.post('/workout-log', checkAuthenticated, (req, res) => {
             console.error('Database error:', err);
             return res.send(`Database error: ${err.sqlMessage || err.message}`);
         }
-        res.redirect('/log-workout');
+        res.redirect('/workout-log');
     });
 });
 
