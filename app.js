@@ -356,6 +356,11 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
     });
 });
 
+app.get('/plans', (req, res) => {
+    const sql = 'SELECT * FROM user u JOIN userplans up ON u.id = up.userid JOIN plans_activity pa ON up.plans_activityid = pa.id JOIN activity a ON a.activityid = pa.activity_id JOIN plans p ON p.plansid = pa.plans_id';
+    connection.query(sql, [activityName, video, difficulty], (err, resutlts) => {
+
+    });
 app.get('/log-workout', checkAuthenticated, (req, res) => {
     res.render('workout-log', { user: req.session.user });
 });
