@@ -511,7 +511,7 @@ app.post('/workout-log', checkAuthenticated, (req, res) => {
             return res.status(500).send('Database error');
         }
 
-        res.redirect('/log-workout');
+        res.redirect('/workout-log');
     });
 });
 
