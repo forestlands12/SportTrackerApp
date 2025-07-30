@@ -24,7 +24,8 @@ const connection = mysql.createConnection({
     port: 3306,
     user: `c237admin`,
     password: `c2372025!`,
-    database: `c237_sportstracker`
+    database: `c237_sportstracker`,
+    waitForConnections: true,
 });
 
 
@@ -93,16 +94,8 @@ const validateRegistration = (req, res, next) => {
 };
 
 // Define routes
-app.get('/', (req, res) => {
-    if (req.session.user) {
-        if (req.session.user.role === 'admin') {
-            res.redirect('/dashboard');
-        } else {
-            res.redirect('/activities');
-        }
-    } else {
-        res.render('index', { user: null });
-    }
+app.get('/',  (req, res) => {
+    res.render('index', {user: req.session.user} );
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
@@ -300,7 +293,7 @@ app.get('/activity/:id', checkAuthenticated, (req, res) => {
   });
 });
 
-app.get('/addActivity', checkAuthenticated, checkAdmin, (req, res) => {
+app.get('/addactivity', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('addActivity', {user: req.session.user } ); 
 });
 
@@ -387,7 +380,7 @@ app.get('/deleteActivity/:id', (req, res) => {
 
 app.get('/profile', checkAuthenticated, (req, res) => {
     const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user });
+    res.render('profile', { user: req.session.user, summary });
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
@@ -400,12 +393,7 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
 
     const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
     connection.query(sql, [email, address, contact, userId], (err, result) => {
-        if (err) {
-            console.error("Error updating profile:", err);
-            return res.status(500).send('Error updating profile');
-        }
-
-        // Update session user so profile page shows new info
+        if (err) throw err;
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
