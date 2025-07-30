@@ -315,6 +315,11 @@ app.get('/deleteActivity/:id', (req, res) => {
     });
 });
 
+app.get('/profile', checkAuthenticated, (req, res) => {
+    const summary = req.session.summary || [];
+    res.render('profile', { user: req.session.user, summary });
+});
+
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
     res.render('editProfile', { user: req.session.user });
 });
