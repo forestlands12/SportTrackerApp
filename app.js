@@ -477,19 +477,20 @@ app.get('/workout-log', (req, res) => {
 });
 
 
-app.post('/add-workout-log', checkAuthenticated, (req, res) => {
+app.post('/log-workout', checkAuthenticated, (req, res) => {
     const { workout_type, duration, calories_burned, intensity } = req.body;
     const workout_date = new Date();
 
     const sql = 'INSERT INTO workout_log (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
     connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
         if (err) {
-            console.error('❌ Database error:', err);
+            console.error('Database error:', err);
             return res.send(`Database error: ${err.sqlMessage || err.message}`);
         }
-        res.redirect('/workout-log');
+        res.redirect('/log-workout');
     });
 });
+
 
 // GET route - Display contact page
 app.get('/contact', (req, res) => {
@@ -512,7 +513,6 @@ app.post('/contact', (req, res) => {
         }
     });
 });
-
 
 app.get('/plans', (req, res) => { //Done by Aloysius
     // Removed p.plan_name from the SELECT statement as it's not available
