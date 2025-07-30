@@ -119,6 +119,36 @@
     <a href="/goal-log/" class="btn btn-primary">Add New Goal <i class="fa fa-plus"></i></a>
   <% } %>
 
+<h3>Log Activity</h3>
+<% if (workout_log && workout_log.length > 0) { %>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Total Logged Activity:</strong> <%= workout_log.length %></p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="/workout-log/" class="btn btn-success">Log New Activity <i class="fa fa-plus"></i></a>
+        </div>
+    </div>
+    <ul class="list-group mt-3">
+        <% workout_log.forEach(function(workout) { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong><%= workout.workout_type %></strong> <br>
+                    <small>Duration: <%= workout.duration %> mins</small> <br>
+                    <small>Calories Burned: <%= workout.calories_burned %> kcal</small> <br>
+                    <small>Intensity: <%= workout.intensity %></small>
+                </div>
+                <span class="badge bg-primary rounded-pill">
+                    <%= new Date(workout.workout_date).toLocaleDateString() %>
+                </span>
+            </li>
+        <% }); %>
+    </ul>
+<% } else { %>
+    <p>You haven't logged any workouts yet. Start by adding one!</p>
+    <a href="/workout-log/" class="btn btn-primary">Log New Activity <i class="fa fa-plus"></i></a>
+<% } %>
+
   <!-- Footer -->
   <footer class="bg-dark text-white py-3 mt-4">
     <div class="container text-center">
