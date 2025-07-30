@@ -321,7 +321,7 @@ app.get('/profile', checkAuthenticated, (req, res) => {
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
-    res.render('editProfile', { user: req.session.user });
+    res.render('editprofile', { user: req.session.user });
 });
 
 app.post('/edit-profile', (req, res) => {
