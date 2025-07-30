@@ -317,7 +317,7 @@ app.get('/deleteActivity/:id', (req, res) => {
 
 app.get('/profile', checkAuthenticated, (req, res) => {
     const summary = req.session.summary || [];
-    res.render('profile', { user: req.session.user });
+    res.render('profile', { user: req.session.user, summary });
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
@@ -326,16 +326,12 @@ app.get('/edit-profile', checkAuthenticated, (req, res) => {
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {
     const { email, address, contact } = req.body;
-    const userId = req.session.user.userId;
+    const userId = req.session.user.id;
 
-    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE userId = ?';
-    connection.query(sql, [email, address, contact, userId], (err) => {
-        if (err) {
-            console.error("Error updating profile:", err);
-            return res.status(500).send('Error updating profile');
-        }
+    const sql = 'UPDATE users SET email = ?, address = ?, contact = ? WHERE id = ?';
+    connection.query(sql, [email, address, contact, userId], (err, result) => {
+        if (err) throw err;
 
-        // Update session info so it reflects changes immediately
         req.session.user.email = email;
         req.session.user.address = address;
         req.session.user.contact = contact;
