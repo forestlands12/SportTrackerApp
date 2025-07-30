@@ -414,7 +414,24 @@ app.post('/edit-profile', checkAuthenticated, (req, res) => {
 });
 
 app.get('/plans', (req, res) => {
-    const sql = 'SELECT * FROM plans p JOIN plans_activities pa ON p.plansid = pa.plansid' 
+    const sql = 'SELECT * FROM user u JOIN userplans up ON u.id = up.userid JOIN plans_activity pa ON up.plans_activityid = pa.id JOIN activity a ON a.activityid = pa.activity_id JOIN plans p ON p.plansid = pa.plans_id';
+    connection.query(sql, [activityName, video, difficulty], (err, resutlts) => {
+
+    });
+app.get('/log-workout', checkAuthenticated, (req, res) => {
+    res.render('workout-log', { user: req.session.user });
+});
+
+app.post('/log-workout', checkAuthenticated, (req, res) => {
+    const { workout_type, duration, calories_burned, intensity } = req.body;
+    const workout_date = new Date(); // Get current date
+
+    // Insert workout into the database
+    const sql = 'INSERT INTO workouts (user_id, workout_type, duration, calories_burned, intensity, workout_date) VALUES (?, ?, ?, ?, ?, ?)';
+    connection.query(sql, [req.session.user.id, workout_type, duration, calories_burned, intensity, workout_date], (err, result) => {
+        if (err) throw err;
+        res.redirect('/log-workout');  // Redirect back to log workout page after submission
+    });
 });
 
 // GET route - Display contact page
