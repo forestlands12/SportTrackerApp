@@ -93,8 +93,16 @@ const validateRegistration = (req, res, next) => {
 };
 
 // Define routes
-app.get('/',  (req, res) => {
-    res.render('index', {user: req.session.user} );
+app.get('/', (req, res) => {
+    if (req.session.user) {
+        if (req.session.user.role === 'admin') {
+            res.redirect('/dashboard');
+        } else {
+            res.redirect('/activities');
+        }
+    } else {
+        res.render('index', { user: null });
+    }
 });
 
 app.get('/dashboard', checkAuthenticated, checkAdmin, (req, res) => {
@@ -321,7 +329,7 @@ app.get('/profile', checkAuthenticated, (req, res) => {
 });
 
 app.get('/edit-profile', checkAuthenticated, (req, res) => {
-    res.render('editProfile', { user: req.session.user });
+    res.render('editprofile', { user: req.session.user });
 });
 
 app.post('/edit-profile', checkAuthenticated, (req, res) => {

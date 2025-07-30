@@ -62,20 +62,10 @@
 
     <div class="container content-box">
         <p style="text-align: center;">
-            <% if (user) {%>
-              <% if (user.role === "admin") { %>
-                <br>
-                Back to <a href="/dashboard">dashboard!</a>
-              <% } else { %>
-                <br>
-                Continue to <a href="/activities">Activities!</a>
-                <% } %>
-            <% } else { %>
             <br>
             Welcome to SportTracker app!
             <br>
             Please <a href = "/login" >login</a> to continue...
-            <% } %>
         </p>
     </div>
 </body>
