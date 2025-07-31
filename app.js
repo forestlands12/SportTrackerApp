@@ -169,7 +169,7 @@ app.post('/addactivity', checkAuthenticated, checkAdmin, upload.single('video'),
         videoFile
     ];
 
-    pool.query(sql, values, (error, results) => {
+    connection.query(sql, values, (error, results) => {
         if (error) {
             console.error("Error adding activity:", error);
             req.flash('error', 'Database error. Could not add activity.');
