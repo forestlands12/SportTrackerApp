@@ -155,10 +155,10 @@ app.post('/addactivity', checkAuthenticated, checkAdmin, upload.single('video'),
     let videoFile = req.file ? req.file.filename : null;
 
     const sql = `
-        INSERT INTO activities 
-        (activityName, difficulty, rec_sets, rec_reps, rec_duration_mins, progression, video) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
+    INSERT INTO activities 
+    (activityName, difficulty, rec_sets, rec_reps, rec_duration_mins, progression, image) 
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+`;
     const values = [
         activityName,
         difficulty,
