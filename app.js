@@ -176,7 +176,7 @@ app.post('/addactivity', checkAuthenticated, checkAdmin, upload.single('video'),
             return res.redirect('/addactivity');
         }
         req.flash('success', 'New activity has been added to the library!');
-        res.redirect('/admin/activities');
+        res.redirect('/dashboard');
     });
 });
 
