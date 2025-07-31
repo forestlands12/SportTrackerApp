@@ -330,45 +330,47 @@ app.post('/addActivity', upload.single('video'),  (req, res) => {
     });
 });
 
-app.get('/updateActivity/:id',checkAuthenticated, checkAdmin, (req,res) => {
+app.get('/updateActivity/:id', checkAuthenticated, checkAdmin, (req, res) => {
     const activityId = req.params.id;
     const sql = 'SELECT * FROM activities WHERE activityId = ?';
 
-    // Fetch data from MySQL based on the activity ID
-    connection.query(sql , [activityId], (error, results) => {
-        if (error) throw error;
+    connection.query(sql, [activityId], (err, results) => {
+        if (err) return res.status(500).send('Database error');
+        if (results.length === 0) return res.status(404).send('Activity not found');
 
-        // Check if any activity with the given ID was found
-        if (results.length > 0) {
-            // Render HTML page with the activity data
-            res.render('updateActivity', { activity: results[0] });
-        } else {
-            // If no activity with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('Activity not found');
-        }
+        res.render('updateActivity', { activity: results[0] });
     });
 });
 
-app.post('/updateActivity/:id', upload.single('image'), (req, res) => {
+// POST Update Activity
+app.post('/updateActivity/:id', checkAuthenticated, checkAdmin, upload.single('image'), (req, res) => {
     const activityId = req.params.id;
-    // Extract activity data from the request body
-    const { name, quantity, price } = req.body;
-    let image  = req.body.currentVideo; //retrieve current image filename
-    if (req.file) { //if new image is uploaded
-        image = req.file.filename; // set image to be new image filename
-    } 
+    const {
+        activityName, difficulty, rec_sets, rec_reps, rec_duration_mins, progression, currentImage
+    } = req.body;
 
-    const sql = 'UPDATE activities SET activityName = ? , video =? WHERE activityId = ?';
-    // Insert the new activity into the database
-    connection.query(sql, [name, video, activityId], (error, results) => {
-        if (error) {
-            // Handle any error that occurs during the database operation
-            console.error("Error updating activity:", error);
-            res.status(500).send('Error updating activity');
-        } else {
-            // Send a success response
-            res.redirect('/dashboard');
+    const newImage = req.file ? req.file.filename : currentImage;
+
+    const sql = `
+        UPDATE activities SET 
+            activityName = ?, 
+            difficulty = ?, 
+            rec_sets = ?, 
+            rec_reps = ?, 
+            rec_duration_mins = ?, 
+            progression = ?, 
+            image = ?
+        WHERE activityId = ?
+    `;
+
+    const values = [activityName, difficulty, rec_sets || null, rec_reps || null, rec_duration_mins || null, progression, newImage, activityId];
+
+    connection.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Error updating activity:', err);
+            return res.status(500).send('Update failed');
         }
+        res.redirect('/dashboard');
     });
 });
 
